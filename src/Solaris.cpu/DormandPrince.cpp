@@ -408,66 +408,6 @@ int DormandPrince::Step2(BodyData *bodyData, Acceleration *acceleration)
 	// f9 = f[8]
 	acceleration->Compute(ttemp, yTemp, f[k]);
 
-	//// yTemp to compute f3
-	//for (int i = 0; i < nVar; i++) {
-	//	yTemp[i] = bodyData->y0[i] + h*(a[2][0]*f[0][i] + a[2][1]*f[1][i]);
-	//}
-
-	//// f3 = f[2]
-	//ttemp = bodyData->time + c[2] * h;
-	//acceleration->Compute(ttemp, yTemp, f[2]);
-
-	//for (int i = 0; i < nVar; i++) {
-	//	yTemp[i] = bodyData->y0[i] + h*(a[3][0]*f[0][i] + a[3][1]*f[1][i] + a[3][2]*f[2][i]);
-	//}
-
-	//// f4 = f[3]
-	//ttemp = bodyData->time + c[3] * h;
-	//acceleration->Compute(ttemp, yTemp, f[3]);
-
-	//for (int i = 0; i < nVar; i++) {
-	//	yTemp[i] = bodyData->y0[i] + h*(a[4][0]*f[0][i] + a[4][1]*f[1][i] + a[4][2]*f[2][i] + a[4][3]*f[3][i]);
-	//}
-
-	//// f5 = f[4]
-	//ttemp = bodyData->time + c[4] * h;
-	//acceleration->Compute(ttemp, yTemp, f[4]);
-
-	//for (int i = 0; i < nVar; i++) {
-	//	yTemp[i] = bodyData->y0[i] + h*(a[5][0]*f[0][i] + a[5][1]*f[1][i] + a[5][2]*f[2][i] + a[5][3]*f[3][i] + a[5][4]*f[4][i]);
-	//}
-
-	//// f6 = f[5]
-	//ttemp = bodyData->time + c[5] * h;
-	//acceleration->Compute(ttemp, yTemp, f[5]);
-
-	//for (int i = 0; i < nVar; i++) {
-	//	yTemp[i] = bodyData->y0[i] + h*(a[6][0]*f[0][i] + a[6][1]*f[1][i] + a[6][2]*f[2][i] + a[6][3]*f[3][i] + a[6][4]*f[4][i] +
-	//									a[6][5]*f[5][i]);
-	//}
-
-	//// f7 = f[6]
-	//ttemp = bodyData->time + c[6] * h;
-	//acceleration->Compute(ttemp, yTemp, f[6]);
-
-	//for (int i = 0; i < nVar; i++) {
-	//	yTemp[i] = bodyData->y0[i] + h*(a[7][0]*f[0][i] + a[7][1]*f[1][i] + a[7][2]*f[2][i] + a[7][3]*f[3][i] + a[7][4]*f[4][i] + 
-	//									a[7][5]*f[5][i] + a[7][6]*f[6][i]);
-	//}
-
-	//// f8 = f[7]
-	//ttemp = bodyData->time + c[7] * h;
-	//acceleration->Compute(ttemp, yTemp, f[7]);
-
-	//for (int i = 0; i < nVar; i++) {
-	//	yTemp[i] = bodyData->y0[i] + h*(a[8][0]*f[0][i] + a[8][1]*f[1][i] + a[8][2]*f[2][i] + a[8][3]*f[3][i] + a[8][4]*f[4][i] + 
-	//									a[8][5]*f[5][i] + a[8][6]*f[6][i]);
-	//}
-
-	//// f9 = f[8]
-	//ttemp = bodyData->time + c[8] * h;
-	//acceleration->Compute(ttemp, yTemp, f[8]);
-
 	for (int i = 0; i < bodyData->nBodies.total; i++) {
 		int i0 = 6 * i;
 		for (int j = 0; j < 3; j++) {
@@ -483,8 +423,9 @@ int DormandPrince::Step2(BodyData *bodyData, Acceleration *acceleration)
 	}
 
 	// i=0 changed to i=1
-	for (int i = 1; i < 9; i++)
+	for (int i = 1; i < 9; i++) {
 		delete[] f[i];
+	}
 	delete[] yTemp;
 
 	return 0;

@@ -32,8 +32,8 @@
 
 RungeKuttaFehlberg78::RungeKuttaFehlberg78()
 {
-	name		= "Classical eight-order Runge-Kutta-Nyström method with stepsize control.";
-	reference	= "NASA Technical Reports R-381, by Erwin Fehlberg, 1972.";
+	name		= "Classical eight-order Runge-Kutta-Fehlberg method with stepsize control.";
+	reference	= "NASA Technical Reports R-287, by Erwin Fehlberg, 1968.";
 
 	accuracy = -10.0;
 	epsilon	 = pow(10, accuracy);
@@ -167,83 +167,99 @@ int RungeKuttaFehlberg78::Step(BodyData *bodyData, Acceleration *acceleration)
 	double	h = bodyData->h;
 	double	t = bodyData->time;
 //1. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_1_0*fk[0][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[1]);
 //2. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_2_0*fk[0][i] + D_2_1*fk[1][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[2]);
 //3. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_3_0*fk[0][i] + D_3_2*fk[2][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[3]);
 //4. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_4_0*fk[0][i] + D_4_2*fk[2][i] + D_4_3*fk[3][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[4]);
 //5. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_5_0*fk[0][i] + D_5_3*fk[3][i] + D_5_4*fk[4][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[5]);
 //6. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_6_0*fk[0][i] + D_6_3*fk[3][i] + D_6_4*fk[4][i] + D_6_5*fk[5][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[6]);
 //7. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_7_0*fk[0][i] + D_7_4*fk[4][i] + D_7_5*fk[5][i] + D_7_6*fk[6][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[7]);
 //8. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_8_0*fk[0][i] + D_8_3*fk[3][i] + D_8_4*fk[4][i] +
 						  D_8_5*fk[5][i] + D_8_6*fk[6][i] + D_8_7*fk[7][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[8]);
 //9. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_9_0*fk[0][i] + D_9_3*fk[3][i] + D_9_4*fk[4][i] +
 						  D_9_5*fk[5][i] + D_9_6*fk[6][i] + D_9_7*fk[7][i] + D_9_8*fk[8][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[9]);
 //10. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_10_0*fk[0][i] + D_10_3*fk[3][i] + D_10_4*fk[4][i] + D_10_5*fk[5][i] +
 						  D_10_6*fk[6][i] + D_10_7*fk[7][i] + D_10_8*fk[8][i] + D_10_9*fk[9][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[10]);
 //11. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_11_0*fk[0][i] + D_11_5*fk[5][i] + D_11_6*fk[6][i] +
 						  D_11_7*fk[7][i] + D_11_8*fk[8][i] + D_11_9*fk[9][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[11]);
 //12. substep
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		yTemp[i] = bodyData->y0[i] + h*(D_12_0*fk[0][i] + D_12_3*fk[3][i] + D_12_4*fk[4][i] + D_12_5*fk[5][i] +
 						  D_12_6*fk[6][i] + D_12_7*fk[7][i] + D_12_8*fk[8][i] + D_12_9*fk[9][i] +
 						  D_12_11*fk[11][i]);
+	}
 
 	acceleration->Compute(t, yTemp, fk[12]);
 	// The result of the step
-	for (int i=0; i<nVar; i++)
+	for (int i=0; i<nVar; i++) {
 		bodyData->y[i] = bodyData->y0[i] + h*(D1_0*fk[0][i] + D1_5*fk[5][i] + D1_6*(fk[6][i] + fk[7][i]) +
 							D1_8*(fk[8][i] + fk[9][i]) + D1_10*fk[10][i]);
+	}
 
 	// Error estimation
-	for (int i=0; i<nVar; i++)
-		bodyData->error[i] = h*fabs(fk[0][i] + fk[10][i]-fk[11][i]-fk[12][i])*41.0/840.0;
+	double s = 41.0/840.0 * fabs(h);
+	for (int i=0; i<nVar; i++) {
+		bodyData->error[i] = s * fabs(fk[0][i] + fk[10][i] - fk[11][i] - fk[12][i]);
+	}
 
 	// i=0 changed to i=1
-	for (int i=1; i<13; i++)
+	for (int i=1; i<13; i++) {
 		delete[] fk[i];
+	}
 	delete[] yTemp;
 
 	return 0;
