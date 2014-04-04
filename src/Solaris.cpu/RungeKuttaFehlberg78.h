@@ -10,11 +10,14 @@
 
 #include <string>
 
+#include "Integrator.h"
+
 class Acceleration;
 class BodyData;
 class TimeLine;
 
-class RungeKuttaFehlberg78 {
+class RungeKuttaFehlberg78 : public Integrator
+{
 public:
 
 	RungeKuttaFehlberg78();
@@ -24,10 +27,6 @@ public:
 	int 		Step(  BodyData *bodyData, Acceleration *acceleration);
 	double		GetErrorMax(const int n, const double *yerr, const double *yscale);
 
-	std::string	name;
-	std::string	reference;
-	double		accuracy;
-	double		epsilon;
 
 private:
 	double 	D1_0, D1_1, D1_2, D1_3, D1_4, D1_5,	D1_6, D1_7, D1_8, D1_9, D1_10, D1_11, D1_12;
@@ -45,6 +44,3 @@ private:
 };
 
 #endif
-
-
-

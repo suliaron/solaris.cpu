@@ -61,23 +61,23 @@ int Simulator::Continue()
 
 int Simulator::Run()
 {
-	if (     _simulation->settings.integrator.name == "rungekutta78" || _simulation->settings.integrator.name == "rungekuttafehlberg78") {
-		integratorType = RUNGE_KUTTA_FEHLBERG78;
-		rungeKuttaFehlberg78 =  new RungeKuttaFehlberg78();
-	}
-	else if (_simulation->settings.integrator.name == "rungekutta4") {
-		integratorType = RUNGE_KUTTA4;
-		rungeKutta4 = new RungeKutta4();
-	}
-	else if (_simulation->settings.integrator.name == "dormandprince") {
-		integratorType = DORMAND_PRINCE;
-		dormandPrince = new DormandPrince();
-	}
-	else {
-		Error::_errMsg = "Unknown integrator type!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
-	}
+	//if (     _simulation->settings.integrator.name == "rungekutta78" || _simulation->settings.integrator.name == "rungekuttafehlberg78") {
+	//	integratorType = RUNGE_KUTTA_FEHLBERG78;
+	//	rungeKuttaFehlberg78 =  new RungeKuttaFehlberg78();
+	//}
+	//else if (_simulation->settings.integrator.name == "rungekutta4") {
+	//	integratorType = RUNGE_KUTTA4;
+	//	rungeKutta4 = new RungeKutta4();
+	//}
+	//else if (_simulation->settings.integrator.name == "dormandprince") {
+	//	integratorType = DORMAND_PRINCE;
+	//	dormandPrince = new DormandPrince();
+	//}
+	//else {
+	//	Error::_errMsg = "Unknown integrator type!";
+	//	Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+	//	return 1;
+	//}
 
 	_acceleration = new Acceleration(integratorType, _simulation->settings.baryCentric, &bodyData, _simulation->nebula);
 
@@ -130,27 +130,31 @@ int Simulator::Integrate(TimeLine* timeLine)
 	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals);
 
 	bool stop = false;
-	for ( ; ; ) {
-		switch (integratorType) {
-			case RUNGE_KUTTA_FEHLBERG78:
-				if (rungeKuttaFehlberg78->Driver(&bodyData, _acceleration, timeLine) == 1) {
-					Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-					return 1;
-				}
-				break;
-			case RUNGE_KUTTA4:
-				if (rungeKutta4->Driver(&bodyData, _acceleration, timeLine) == 1) {
-					Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-					return 1;
-				}
-				break;
-			case DORMAND_PRINCE:
-				if (dormandPrince->Driver(&bodyData, _acceleration, timeLine) == 1) {
-					Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-					return 1;
-				}
-				break;
+	while ( 1 ) {
+		if (_simulation->settings.integrator->Driver(&bodyData, _acceleration, timeLine) == 1) {
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
 		}
+		//switch (integratorType) {
+		//	case RUNGE_KUTTA_FEHLBERG78:
+		//		if (rungeKuttaFehlberg78->Driver(&bodyData, _acceleration, timeLine) == 1) {
+		//			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		//			return 1;
+		//		}
+		//		break;
+		//	case RUNGE_KUTTA4:
+		//		if (rungeKutta4->Driver(&bodyData, _acceleration, timeLine) == 1) {
+		//			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		//			return 1;
+		//		}
+		//		break;
+		//	case DORMAND_PRINCE:
+		//		if (dormandPrince->Driver(&bodyData, _acceleration, timeLine) == 1) {
+		//			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		//			return 1;
+		//		}
+		//		break;
+		//}
 		counter.succededStep++;
 		if (DecisionMaking(timeLine, stop) == 1) {
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);

@@ -32,11 +32,8 @@
 
 RungeKuttaFehlberg78::RungeKuttaFehlberg78()
 {
-	name		= "Classical eight-order Runge-Kutta-Fehlberg method with stepsize control.";
-	reference	= "NASA Technical Reports R-287, by Erwin Fehlberg, 1968.";
-
-	accuracy = -10.0;
-	epsilon	 = pow(10, accuracy);
+	name = "Runge-Kutta 7(8)";
+	reference = "NASA Technical Reports R-287, by Erwin Fehlberg, 1968.";
 
 	D1_0 = 41.0/840.0, D1_1 = 0.0, D1_2 = 0.0, D1_3 = 0.0, D1_4 = 0.0, D1_5 = 34.0/105.0;
 	D1_6 = 9.0/35.0, D1_7 = 9.0/35.0, D1_8 = 9.0/280.0, D1_9 = 9.0/280.0, D1_10 = 41.0/840.0;
@@ -81,21 +78,17 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 	// Calculate the acceleration in the initial point
 	acceleration->Compute(timeLine->time, bodyData->y0, bodyData->accel);
 
-	// TODO: ezt a ciklust a végtelen ciklus belsejebe kell mozgatni, hiszen ha a lépésköz változik akkor annak
-	// megfelelően ennek is változnia kell. Ezt átgondolni.
-	// Most megnézem. Nem javított a helyzeten, ezért visszateszem a cikoson kívulre.
-	for (int i=0; i<nVar; i++) {
-		bodyData->yscale[i] = fabs(bodyData->y0[i]) + fabs(bodyData->h * bodyData->accel[i]) + TINY;
-	}
-
 	// NOTE: Kikapcsolom a GasDrag erők kiszámítását, gyorsítva ezzel az integrálást.
 	// Készíteni összehasonlításokat, és értékelni az eredményeket, abbol a szempontbol, hogy így mennyire pontos az integralas.
-	//acceleration->evaluateGasDrag			= false;
+	acceleration->evaluateGasDrag			= false;
 	acceleration->evaluateTypeIMigration	= false;
 	acceleration->evaluateTypeIIMigration	= false;
 
 	double	errorMax = 0.0;
-	for ( ; ; ) {
+	while ( 1 ) {
+		//for (int i=0; i<nVar; i++) {
+		//	bodyData->yscale[i] = fabs(bodyData->y0[i]) + fabs(bodyData->h * bodyData->accel[i]) + TINY;
+		//}
 
 		//if (Step(bodyData, acceleration, bodyData->accel, bodyData->time, bodyData->h, bodyData->y, bodyData->error) == 1) {
 		if (Step(bodyData, acceleration) == 1) {
@@ -269,8 +262,9 @@ double RungeKuttaFehlberg78::GetErrorMax(const int n, const double *yerr, const 
 {
 	double errorMax = 0.0;
 
-	for (int i=0; i<n; i++) {
-		double err = fabs(yerr[i] / yscale[i]);
+	for (int i = 0; i < n; i++) {
+		//double err = fabs(yerr[i] / yscale[i]);
+		double err = fabs(yerr[i]);
 		if (err > errorMax)
 			errorMax = err;
 	}

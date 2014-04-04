@@ -32,6 +32,7 @@
 #define FORTH(a)	((a)*(a)*(a)*(a))
 #define FIFTH(a)	((a)*(a)*(a)*(a)*(a))
 
+// TODO: Miért kell tudnia neki, hogy ki fogja integrálni? Elvileg neki tök mindegy!!
 Acceleration::Acceleration(IntegratorType iType, bool baryCentric, BodyData *bD, Nebula *n)
 {
 	_integratorType			= iType;
@@ -374,8 +375,7 @@ int	Acceleration::GasDragAC(double t, double *y, double *accel)
                     _stokes = true;
                 }
                 // magnitude of the relative velocity
-		        double uLength = sqrt(u.x*u.x + u.y*u.y + u.z*u.z); 
-		        C = bodyData->gammaStokes[i] * uLength * rhoGas;
+				C = bodyData->gammaStokes[i] * u.Length() * rhoGas;
             }
             // Transition regime
             else {

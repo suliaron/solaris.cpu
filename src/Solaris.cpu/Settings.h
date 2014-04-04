@@ -2,19 +2,22 @@
 #define SETTINGS_H_
 
 #include "Integrator.h"
+#include "IntegratorType.h"
 #include "Output.h"
 
 class EventCondition;
 class TimeLine;
 
-class Settings {
+class Settings
+{
 public:
-
 	Settings();
 
 	bool			enableDistinctStartTimes;
 	bool			baryCentric;
-	Integrator		integrator;
+	Integrator		*integrator;
+	IntegratorType	intgr_type;
+
 	Output			output;
 	TimeLine		*timeLine;
 

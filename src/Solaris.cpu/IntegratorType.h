@@ -10,6 +10,7 @@
 
 
 enum IntegratorType {
+	UNDEFINED,
 	DORMAND_PRINCE,
 	RUNGE_KUTTA4,
 	RUNGE_KUTTA56,

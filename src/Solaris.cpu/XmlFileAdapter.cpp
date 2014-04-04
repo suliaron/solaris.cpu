@@ -8,14 +8,17 @@
 #include "Body.h"
 #include "BodyGroupList.h"
 #include "Constants.h"
-#include "DragCoefficient.h"
+#include "DormandPrince.h"
 #include "Ephemeris.h"
 #include "Error.h"
 #include "EventCondition.h"
 #include "GasDecreaseType.h"
 #include "Integrator.h"
+#include "IntegratorType.h"
 #include "Nebula.h"
 #include "Output.h"
+#include "RungeKutta4.h"
+#include "RungeKuttaFehlberg78.h"
 #include "Settings.h"
 #include "Simulation.h"
 #include "TimeLine.h"
@@ -186,12 +189,9 @@ int XmlFileAdapter::DeserializeSettings(TiXmlElement *xmlElement, Settings *sett
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		// TODO: check this
-		//Integrator integrator;
-		if (DeserializeIntegrator(child->ToElement(), &(settings->integrator)) == 1) {
+		if (DeserializeIntegrator(child->ToElement(), settings) == 1) {
 			return 1;
 		}
-		//settings->integrator = new Integrator(integrator);
 	}
 
 	child = xmlElement->FirstChild("TimeLine");
@@ -458,11 +458,11 @@ int XmlFileAdapter::DeserializeOutput(TiXmlElement *xmlElement, Output *output)
 	return 0;
 }
 
-int XmlFileAdapter::DeserializeIntegrator(TiXmlElement *xmlElement, Integrator *integrator)
+int XmlFileAdapter::DeserializeIntegrator(TiXmlElement *xmlElement, Settings *settings)
 {
 	// Iterate over the attributes
 	for (TiXmlAttribute *attribute = xmlElement->FirstAttribute(); attribute; attribute = attribute->Next() ) {
-		if (DeserializeIntegratorAttributes(attribute, integrator) == 1) {
+		if (DeserializeIntegratorAttributes(attribute, settings) == 1) {
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
@@ -481,13 +481,14 @@ int XmlFileAdapter::DeserializeIntegrator(TiXmlElement *xmlElement, Integrator *
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		integrator->accuracy = accuracy;
+		settings->integrator->accuracy = accuracy;
+		settings->integrator->epsilon  = pow(10, accuracy);
 	}
 
 	return 0;
 }
 
-int XmlFileAdapter::DeserializeIntegratorAttributes(TiXmlAttribute *attribute, Integrator *integrator)
+int XmlFileAdapter::DeserializeIntegratorAttributes(TiXmlAttribute *attribute, Settings *settings)
 {
 	std::string attributeName = attribute->Name();
 	std::string attributeValue = attribute->Value();
@@ -496,7 +497,24 @@ int XmlFileAdapter::DeserializeIntegratorAttributes(TiXmlAttribute *attribute, I
 	std::transform(attributeName.begin(),  attributeName.end(),  attributeName.begin(),  ::tolower);
 	std::transform(attributeValue.begin(), attributeValue.end(), attributeValue.begin(), ::tolower);
 	if (     attributeName == "name" || attributeName == "xsi:type") {
-		integrator->name = attributeValue;
+
+		if (     attributeValue == "rk78" || attributeValue == "rungekutta78" || attributeValue == "rungekuttafehlberg78") {
+			settings->intgr_type = RUNGE_KUTTA_FEHLBERG78;
+			settings->integrator =  new RungeKuttaFehlberg78();
+		}
+		else if (attributeValue == "rk4" || attributeValue == "rungekutta4") {
+			settings->intgr_type = RUNGE_KUTTA4;
+			settings->integrator = new RungeKutta4();
+		}
+		else if (attributeValue == "rkn76" || attributeValue == "dormandprince") {
+			settings->intgr_type = DORMAND_PRINCE;
+			settings->integrator = new DormandPrince();
+		}
+		else {
+			Error::_errMsg = "Unknown integrator type!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
 	// These attributes are only needed because in C# the Integrator class is a base class and the
 	// specialized integrators are derived from this class. This fact is reflected in the xmlns

@@ -10,11 +10,7 @@
 
 RungeKutta4::RungeKutta4()
 {
-	name		= "The classical Runge–Kutta method";
 	reference	= "";//"http\://en.wikipedia.org/wiki/Runge-kutta#Explicit_Runge.E2.80.93Kutta_methods";
-
-	accuracy = -10.0;
-	epsilon	 = pow(10, accuracy);
 }
 
 int RungeKutta4::Driver(BodyData *bodyData, Acceleration *acceleration, TimeLine *timeLine)
@@ -32,7 +28,7 @@ int RungeKutta4::Driver(BodyData *bodyData, Acceleration *acceleration, TimeLine
 	// Calculate the acceleration in the initial point
 	acceleration->Compute(timeLine->time, bodyData->y0, bodyData->accel);
 
-	//acceleration->evaluateGasDrag			= false;
+	acceleration->evaluateGasDrag			= false;
 	acceleration->evaluateTypeIMigration	= false;
 	acceleration->evaluateTypeIIMigration	= false;
 

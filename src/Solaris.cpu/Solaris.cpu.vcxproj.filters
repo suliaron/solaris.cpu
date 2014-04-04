@@ -54,9 +54,6 @@
     <ClInclude Include="DormandPrince.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DragCoefficient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Ephemeris.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -189,9 +186,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DormandPrince.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DragCoefficient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Ephemeris.cpp">

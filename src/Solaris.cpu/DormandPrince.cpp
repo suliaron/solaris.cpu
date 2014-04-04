@@ -25,11 +25,7 @@
 
 DormandPrince::DormandPrince()
 {
-	name		= "Dormand-Prince 7(6)";
 	reference	= "New Runge-Kutta Algorithms for Numerical Simulation in Dynamical Astronomy, Celestial Mechanics, Vol. 18(1978), 223-232.";
-
-	accuracy = -10.0;
-	epsilon	 = pow(10, accuracy);
 
 	maxIter			= 10;
 	sizeHeightRKD	= 9;
@@ -136,7 +132,7 @@ int DormandPrince::Driver(BodyData *bodyData, Acceleration *acceleration, TimeLi
 
 	// NOTE: Kikapcsolom a GasDrag erők kiszámítását, gyorsítva ezzel az integrálást.
 	// Készíteni összehasonlításokat, és értékelni az eredményeket, abbol a szempontbol, hogy így mennyire pontos az integralas.
-	//acceleration->evaluateGasDrag			= false;
+	acceleration->evaluateGasDrag			= false;
 	acceleration->evaluateTypeIMigration	= false;
 	acceleration->evaluateTypeIIMigration	= false;
 
@@ -147,7 +143,7 @@ int DormandPrince::Driver(BodyData *bodyData, Acceleration *acceleration, TimeLi
 		bodyData->h		= timeLine->hNext;
 		//if (Step(bodyData, acceleration) == 1) {
 		if (Step2(bodyData, acceleration) == 1) {
-			Error::_errMsg = "An error occurred during Prince-Dormand step!";
+			Error::_errMsg = "An error occurred during Dormand-Prince step!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
@@ -156,7 +152,7 @@ int DormandPrince::Driver(BodyData *bodyData, Acceleration *acceleration, TimeLi
 		timeLine->hNext = errorMax < 1.0e-20 ? 2.0*bodyData->h : 0.9*bodyData->h*pow(epsilon / errorMax, 1.0/7.0);
 	} while (errorMax > epsilon && iter <= maxIter);
 	if (iter > maxIter) {
-		Error::_errMsg = "An error occurred during Prince-Dormand driver: iteration number exceeded maxIter!";
+		Error::_errMsg = "An error occurred during Dormand-Prince driver: iteration number exceeded maxIter!";
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}

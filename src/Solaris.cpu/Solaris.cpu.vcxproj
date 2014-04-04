@@ -24,7 +24,6 @@
     <ClInclude Include="Counter.h" />
     <ClInclude Include="DateTime.h" />
     <ClInclude Include="DormandPrince.h" />
-    <ClInclude Include="DragCoefficient.h" />
     <ClInclude Include="Ephemeris.h" />
     <ClInclude Include="Error.h" />
     <ClInclude Include="Event.h" />
@@ -71,7 +70,6 @@
     <ClCompile Include="Counter.cpp" />
     <ClCompile Include="DateTime.cpp" />
     <ClCompile Include="DormandPrince.cpp" />
-    <ClCompile Include="DragCoefficient.cpp" />
     <ClCompile Include="Ephemeris.cpp" />
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="Event.cpp" />

@@ -2,12 +2,14 @@
 #define DORMAND_PRINCE_H_
 
 #include <string>
+#include "Integrator.h"
 
 class Acceleration;
 class BodyData;
 class TimeLine;
 
-class DormandPrince {
+class DormandPrince : public Integrator
+{
 public:
 	DormandPrince();
 
@@ -16,19 +18,9 @@ public:
 	int 		Step2( BodyData *bodyData, Acceleration *acceleration);
 	double		GetErrorMax(int n, const double *yerr);
 
-	std::string	name;
-	std::string	reference;
-	double		accuracy;
-	double		epsilon;
-
 private:
 	int		maxIter;
 	int		sizeHeightRKD;
-	//double	D1[9];
-	//double	D2[9];
-	//double	D3[9];
-	//double	D4[9];
-	//double	D[9][8];
 	double	b[9];
 	double	bh[9];
 	double	bdh[9];

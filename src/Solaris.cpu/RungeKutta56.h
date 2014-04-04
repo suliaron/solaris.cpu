@@ -1,7 +1,10 @@
 #ifndef RUNGEKUTTA56_H_
 #define RUNGEKUTTA56_H_
 
-class RungeKutta56 {
+#include "Integrator.h"
+
+class RungeKutta56 : public Integrator
+{
 public:
 	RungeKutta56();
 

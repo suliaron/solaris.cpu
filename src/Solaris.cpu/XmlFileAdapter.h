@@ -7,7 +7,6 @@ class BodyGroup;
 class BodyGroupList;
 class Characteristics;
 class Component;
-class DragCoefficient;
 class EventCondition;
 class GasComponent;
 class Integrator;
@@ -44,8 +43,8 @@ public:
 
 	static int DeserializeOutput(TiXmlElement *xmlElement, Output *output);
 
-	static int DeserializeIntegrator(TiXmlElement *xmlElement, Integrator *integrator);
-	static int DeserializeIntegratorAttributes(TiXmlAttribute *attribute, Integrator *integrator);
+	static int DeserializeIntegrator(TiXmlElement *xmlElement, Settings *settings);
+	static int DeserializeIntegratorAttributes(TiXmlAttribute *attribute, Settings *settings);
 
 	static int DeserializeAccuracy(TiXmlElement *xmlElement, double *accuracy);
 	static int DeserializeAccuracyAttributes(TiXmlAttribute *attribute, double *accuracy);
@@ -76,17 +75,12 @@ public:
 	static int DeserializeOrbitalElement(TiXmlElement *xmlElement, OrbitalElement *oe);
 	static int DeserializeCharacteristics(TiXmlElement *xmlElement, Characteristics *characteristics, BodyType bodyType);
 	static int DeserializeCharacteristicsAttributes(TiXmlAttribute *attribute, Characteristics *characteristics);
-	//static int DeserializeDragCoefficient(TiXmlElement *xmlElement, DragCoefficient *dragCoefficient);
-	//static int DeserializeDragCoefficientAttributes(TiXmlAttribute *attribute, DragCoefficient *dragCoefficient);
 	static int DeserializeComponentList(TiXmlElement *xmlElement, std::list<Component> *componentList);
 	static int DeserializeComponent(TiXmlElement *xmlElement, Component *component);
 	static int DeserializeComponentAttributes(TiXmlAttribute *attribute, Component *component);
 
 	static int DeserializeNebula(TiXmlElement *xmlElement, Nebula *nebula);
 	static int DeserializeNebulaAttributes(TiXmlAttribute *attribute, Nebula *nebula);
-	//static int DeserializeSolidsComponent(TiXmlElement *xmlElement, SolidsComponent *solidsComponent);
-	//static int DeserializeSolidsDensityFunction(TiXmlElement *xmlElement, SolidsComponent *solidsComponent);
-	//static int DeserializeSolidsDensityFunctionAttributes(TiXmlAttribute *attribute, SolidsComponent *solidsComponent);
 
 	static int DeserializeGasComponent(TiXmlElement *xmlElement, GasComponent *gasComponent);
 	static int DeserializeGasComponentAttributes(TiXmlAttribute *attribute, GasComponent *gasComponent, std::string unitString);
