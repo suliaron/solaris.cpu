@@ -61,24 +61,6 @@ int Simulator::Continue()
 
 int Simulator::Run()
 {
-	//if (     _simulation->settings.integrator.name == "rungekutta78" || _simulation->settings.integrator.name == "rungekuttafehlberg78") {
-	//	integratorType = RUNGE_KUTTA_FEHLBERG78;
-	//	rungeKuttaFehlberg78 =  new RungeKuttaFehlberg78();
-	//}
-	//else if (_simulation->settings.integrator.name == "rungekutta4") {
-	//	integratorType = RUNGE_KUTTA4;
-	//	rungeKutta4 = new RungeKutta4();
-	//}
-	//else if (_simulation->settings.integrator.name == "dormandprince") {
-	//	integratorType = DORMAND_PRINCE;
-	//	dormandPrince = new DormandPrince();
-	//}
-	//else {
-	//	Error::_errMsg = "Unknown integrator type!";
-	//	Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-	//	return 1;
-	//}
-
 	_acceleration = new Acceleration(integratorType, _simulation->settings.baryCentric, &bodyData, _simulation->nebula);
 
 	if (_simulation->bodyGroupList.nOfDistinctStartTimes > 1) {
@@ -135,26 +117,6 @@ int Simulator::Integrate(TimeLine* timeLine)
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		//switch (integratorType) {
-		//	case RUNGE_KUTTA_FEHLBERG78:
-		//		if (rungeKuttaFehlberg78->Driver(&bodyData, _acceleration, timeLine) == 1) {
-		//			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		//			return 1;
-		//		}
-		//		break;
-		//	case RUNGE_KUTTA4:
-		//		if (rungeKutta4->Driver(&bodyData, _acceleration, timeLine) == 1) {
-		//			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		//			return 1;
-		//		}
-		//		break;
-		//	case DORMAND_PRINCE:
-		//		if (dormandPrince->Driver(&bodyData, _acceleration, timeLine) == 1) {
-		//			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		//			return 1;
-		//		}
-		//		break;
-		//}
 		counter.succededStep++;
 		if (DecisionMaking(timeLine, stop) == 1) {
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -181,7 +143,7 @@ int Simulator::Integrate(TimeLine* timeLine)
 	return 0;
 }
 
-#define NSTEP 500
+#define NSTEP 50
 int	Simulator::DecisionMaking(TimeLine* timeLine, bool& stop)
 {
 	timeLine->elapsedTime	+= timeLine->hDid;
@@ -189,13 +151,13 @@ int	Simulator::DecisionMaking(TimeLine* timeLine, bool& stop)
 	timeLine->lastNSteps	+= timeLine->hDid;
 
 #ifdef _DEBUG
-	//if ((counter.succededStep) % NSTEP == 0) {
-	//	int tmp = NSTEP;
-	//	std::cout << (*timeLine);
-	//	std::cout << "Average step-size of the last " << tmp << " steps:" << timeLine->lastNSteps/NSTEP << " [day]" << std::endl;
-	//	std::cout << "Average step-size:" << timeLine->elapsedTime/counter.succededStep << " [day]" << std::endl;
-	//	timeLine->lastNSteps = 0.0;
-	//}
+	if ((counter.succededStep) % NSTEP == 0) {
+		int tmp = NSTEP;
+		std::cout << (*timeLine);
+		std::cout << "Average step-size of the last " << tmp << " steps:" << timeLine->lastNSteps/NSTEP << " [day]" << std::endl;
+		std::cout << "Average step-size:" << timeLine->elapsedTime/counter.succededStep << " [day]" << std::endl;
+		timeLine->lastNSteps = 0.0;
+	}
 #endif
 
 	double actualTime = 1000.0*Constants::YearToDay*timeLine->millenium + timeLine->time;

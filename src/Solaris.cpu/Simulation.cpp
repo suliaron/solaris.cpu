@@ -106,6 +106,7 @@ int Simulation::SetTimeAndSaveOfTimeLine()
 	if (settings.enableDistinctStartTimes == false)
 	{
 		std::list<BodyGroup>::iterator it;
+		// TODO: akkor is erre az ágra fut, ha a star körül csak próbatestek vannak!!
 		if (bodyGroupList.GetBodyGroupWithMassiveBodies(it) == false) {
 			binary->Log("None of the BodyGroups contains massive bodies!", true);
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);

@@ -86,11 +86,10 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 
 	double	errorMax = 0.0;
 	while ( 1 ) {
-		//for (int i=0; i<nVar; i++) {
-		//	bodyData->yscale[i] = fabs(bodyData->y0[i]) + fabs(bodyData->h * bodyData->accel[i]) + TINY;
-		//}
+		for (int i=0; i<nVar; i++) {
+			bodyData->yscale[i] = fabs(bodyData->y0[i]) + fabs(bodyData->h * bodyData->accel[i]) + TINY;
+		}
 
-		//if (Step(bodyData, acceleration, bodyData->accel, bodyData->time, bodyData->h, bodyData->y, bodyData->error) == 1) {
 		if (Step(bodyData, acceleration) == 1) {
 			Error::_errMsg = "An error occurred during Runge-Kutta-Fehlberg7(8) step!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -263,8 +262,8 @@ double RungeKuttaFehlberg78::GetErrorMax(const int n, const double *yerr, const 
 	double errorMax = 0.0;
 
 	for (int i = 0; i < n; i++) {
-		//double err = fabs(yerr[i] / yscale[i]);
-		double err = fabs(yerr[i]);
+		double err = fabs(yerr[i] / yscale[i]);
+		//double err = fabs(yerr[i]);
 		if (err > errorMax)
 			errorMax = err;
 	}

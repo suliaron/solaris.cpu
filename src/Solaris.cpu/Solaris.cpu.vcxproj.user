@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-i C:\Work\SolarisWeb\0_TwoBodyProblem\TwoBodyProblem\eps-10\RK78\TwoBodyProblem.xml</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i C:\Work\Solaris.Cuda.TestRuns\2MStar_5MJupiter_Disc65-270_01\CPU\StarTp\StarTp.xml</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
