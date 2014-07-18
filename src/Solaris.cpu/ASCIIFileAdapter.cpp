@@ -2,11 +2,14 @@
 #include <fstream>
 #include <algorithm>
 
+#include "Common.h"
 #include "Error.h"
 #include "FargoParameters.h"
+#include "Settings.h"
+#include "Simulation.h"
 #include "Tokenizer.h"
 #include "Tools.h"
-#include "Common.h"
+
 /*
 FargoParameters::FargoParameters()
 {
@@ -81,13 +84,13 @@ int ReadConfigFile(std::string& path)
 	return 0;
 }
 
-int SetParameter(std::string& key, std::string& value, settings_t& settings, const bool verbose)
+int SetParameter(std::string& key, std::string& value, Settings& settings, const bool verbose)
 {
 	Trim(key);
 	Trim(value);
 	std::transform(key.begin(), key.end(), key.begin(), ::tolower);
 	std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-	if (key == "enableDistinctStartTimes") {
+	if (key == "enabledistinctstarttimes") {
 		if (!Tools::StringToBool(value,&settings.enableDistinctStartTimes)) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
