@@ -19,6 +19,7 @@
     <ClInclude Include="BodyGroupList.h" />
     <ClInclude Include="Calculate.h" />
     <ClInclude Include="Characteristics.h" />
+    <ClInclude Include="Common.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Counter.h" />
@@ -59,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Acceleration.cpp" />
+    <ClCompile Include="ASCIIFileAdapter.cpp" />
     <ClCompile Include="BinaryFileAdapter.cpp" />
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="BodyData.cpp" />

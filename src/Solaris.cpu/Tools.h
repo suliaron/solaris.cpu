@@ -19,6 +19,7 @@ public:
 	static void	CheckAgainstSmallestNumber(const int n, double *y);
 
 	static bool IsNumber(const std::string& s);
+	static int StringToBool(std::string& s, bool *result);
 	static void TrimRight(std::string& str);
 	static void TrimLeft(std::string& str);
 	static void Trim(std::string& str);

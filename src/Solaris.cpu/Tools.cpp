@@ -56,6 +56,19 @@ bool Tools::IsNumber(const std::string& str)
    return true;
 }
 
+int Tools::StringToBool(std::string& s, bool *result)
+{
+	if(s == "true"){
+		*result = true;
+		return 0;
+	}
+	else if (s == "false"){
+		*result = false;
+		return 0;
+	}
+	else return 1;
+}
+
 /// Removes all trailing white-space characters from the current std::string object.
 void Tools::TrimRight(std::string& str)
 {
