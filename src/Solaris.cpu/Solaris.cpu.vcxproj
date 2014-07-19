@@ -30,6 +30,7 @@
     <ClInclude Include="Event.h" />
     <ClInclude Include="EventCondition.h" />
     <ClInclude Include="FargoParameters.h" />
+    <ClInclude Include="FrameCenter.h" />
     <ClInclude Include="GasComponent.h" />
     <ClInclude Include="GasDecreaseType.h" />
     <ClInclude Include="Integrator.h" />

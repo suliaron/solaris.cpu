@@ -1,6 +1,7 @@
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 
+#include "FrameCenter.h"
 #include "Integrator.h"
 #include "IntegratorType.h"
 #include "Output.h"
@@ -14,7 +15,7 @@ public:
 	Settings();
 
 	bool			enableDistinctStartTimes;
-	bool			baryCentric;
+	FrameCenter		frame_center;
 	Integrator		*integrator;
 	IntegratorType	intgr_type;
 

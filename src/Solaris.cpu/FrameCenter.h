@@ -1,0 +1,10 @@
+#ifndef FRAMECENTER_H_
+#define FRAMECENTER_H_
+
+enum FrameCenter{
+	FRAME_CENTER_ASTRO,
+	FRAME_CENTER_BARY,
+	FRAME_CENTER_N
+};
+
+#endif /* FRAMECENTER_H_ */

@@ -7,56 +7,10 @@
 #include "FargoParameters.h"
 #include "Settings.h"
 #include "Simulation.h"
+#include "TimeLine.h"
 #include "Tokenizer.h"
 #include "Tools.h"
 
-/*
-FargoParameters::FargoParameters()
-{
-	aspectRatio			= 0.05;            // Thickness over Radius in the disc
-	sigma0				= 1.45315e-5;      // Surface Density at r=1
-	alphaViscosity		= 0.001;           // Uniform kinematic viscosity
-	sigmaSlope          = 0.5;             // Slope of surface density profile.
-	flaringIndex        = 0.0;
-	excludeHill			= "YES";
-
-// Planet parameters
-
-	planetConfig        = "./planets.cfg";
-	thicknessSmoothing  = 0.6;             // Smoothing parameters in disk thickness
-
-// Numerical method parameters
-
-	transport           = "FARGO";
-	innerBoundary       = "STOCKHOLM";     // choose : OPEN or RIGID or NONREFLECTING
-	disk                = "YES"; 
-	omegaFrame          = 0;
-	frame               = "COROTATING";
-	indirectTerm        = "YES";
-
-// Mesh parameters
-
-	nRad                = 256;             // Radial number of zones
-	nSec                = 512;             // Azimuthal number of zones (sectors)
-	rMin                = 0.2;             // Inner boundary radius
-	rMax                = 15.0;            // Outer boundary radius
-	radialSpacing       = "Logarithmic";   // Zone interfaces evenly spaced
-
-// Output control parameters
-
-	nTot                = 800000;          // Total number of time steps
-	nInterm             = 2000;            // Time steps between outputs
-	dT                  = 0.314159;        // Time step length. 2PI = 1 orbit
-	outputDir           = "./";
-
-// Viscosity damping due to a dead zone
-
-	viscModR1           = 0.0;             // Inner radius of dead zone
-	viscModDeltaR1      = 0.0;             // Width of viscosity transition at inner radius
-	viscModR2           = 0.0;             // Outer radius of dead zone
-	viscModDeltaR2      = 0.0;             // Width of viscosity transition at outer radius
-	viscMod             = 0.0;             // Viscosity damp
-}*/
 std::string config;
 
 int ReadConfigFile(std::string& path)
@@ -110,69 +64,85 @@ int SetParameter(std::string& key, std::string& value, Settings& settings, const
 			return 1;
 		}
     }
-    else if (key == "Output_Phases") {
+    else if (key == "output_phases") {
+		settings.output.phases = value;
+    }
+    else if (key == "output_constantproperties") {
+		settings.output.constantProperties = value;
+    }
+    else if (key == "output_variableproperties") {
+		settings.output.variableProperties = value;
+    }
+    else if (key == "output_compositionproperties") {
+		settings.output.compositionProperties = value;
+    }
+    else if (key == "output_twobodyaffair") {
+		settings.output.twoBodyAffair = value;
+    }
+    else if (key == "output_integrals") {
+		settings.output.integrals = value;
+    }
+    else if (key == "output_log") {
+		settings.output.log = value;
+    }
+    else if (key == "integrator_name") {
+		if (value == "runge_kutta4") {
+			settings.intgr_type = RUNGE_KUTTA4;
+		}
+		else if (value == "runge_kutta56") {
+			settings.intgr_type = RUNGE_KUTTA56;
+		}
+		else if (value == "runge_kutta_fehlberg78") {
+			settings.intgr_type = RUNGE_KUTTA_FEHLBERG78;
+		}
+		else if (value == "dormand_prince") {
+			settings.intgr_type = DORMAND_PRINCE;
+		}
+		else {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
+    }
+    else if (key == "integrator_accuracy_value") {
 		if (!Tools::IsNumber(value)) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		Output_Phases = atof(value.c_str());
+		settings.integrator->accuracy = atof(value.c_str());
     }
-    else if (key == "Output_ConstantProperties") {
+    else if (key == "timeline_start") {
 		if (!Tools::IsNumber(value)) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		Output_ConstantProperties = atof(value.c_str());
+		settings.timeLine->start = atof(value.c_str());
     }
-    else if (key == "Output_VariableProperties") {
+    else if (key == "timeline_length") {
 		if (!Tools::IsNumber(value)) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		Output_VariableProperties = atof(value.c_str());
+		settings.timeLine->length = atof(value.c_str());
     }
-    else if (key == "Output_CompositionProperties") {
-		Output_CompositionProperties = value;
-    }
-    else if (key == "Output_TwoBodyAffair") {
-		Output_TwoBodyAffair = value;
-    }
-    else if (key == "Output_Integrals") {
+    else if (key == "timeline_output") {
 		if (!Tools::IsNumber(value)) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		Output_Integrals = atof(value.c_str());
-    }
-    else if (key == "Output_Log") {
-		Output_Log = value;
-    }
-    else if (key == "Integrator_name") {
-		Integrator_name = value;
-    }
-    else if (key == "Integrator_Accuracy_value") {
-		Integrator_Accuracy_value = value;
-    }
-    else if (key == "TimeLine_start") {
-		if (!Tools::IsNumber(value)) {
-			Error::_errMsg = "Invalid number: '" + value + "'!";
-			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-			return 1;
-		}
-		TimeLine_start = atof(value.c_str());
-    }
-    else if (key == "TimeLine_length") {
-		TimeLine_length = value;
-    }
-    else if (key == "TimeLine_output") {
-		TimeLine_output = value;
+		settings.timeLine->output = atof(value.c_str());
     }
     else if (key == "TimeLine_unit") {
-		TimeLine_unit = atoi(value.c_str());
+		if (!Tools::IsNumber(value)) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
+		settings.timeLine->start = atof(value.c_str());
     }
     else if (key == "Ejection_value") {
 		if (!Tools::IsNumber(value)) {
