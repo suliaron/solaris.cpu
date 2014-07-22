@@ -1,3 +1,4 @@
+/*
 typedef enum integrator{
 	INTEGRATOR_RK4,
 	INTEGRATOR_RK56,
@@ -17,3 +18,4 @@ typedef struct settings{
 	frame_center_t frame_center;
 
 }settings_t;
+*/

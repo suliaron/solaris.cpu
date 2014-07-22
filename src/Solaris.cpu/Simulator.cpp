@@ -61,7 +61,7 @@ int Simulator::Continue()
 
 int Simulator::Run()
 {
-	_acceleration = new Acceleration(integratorType, _simulation->settings.baryCentric, &bodyData, _simulation->nebula);
+	_acceleration = new Acceleration(integratorType, _simulation->settings.frame_center, &bodyData, _simulation->nebula);
 
 	if (_simulation->bodyGroupList.nOfDistinctStartTimes > 1) {
 		_simulation->binary->Log("The synchronization phase of the simulation begins", false);
@@ -543,7 +543,7 @@ int Simulator::BodyListToBodyData()
 		i++;
 	}
 
-	if (_simulation->settings.baryCentric) {
+	if (_simulation->settings.frame_center == FRAME_CENTER_BARY) {
 		Calculate::PhaseOfBC(&bodyData, bodyData.bc);
 		Tools::ToPhase(bodyData.bc, &(bodyData.phaseOfBC));
 

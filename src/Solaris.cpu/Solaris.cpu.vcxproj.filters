@@ -287,10 +287,10 @@
     <ClCompile Include="Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XmlFileAdapter.cpp">
+    <ClCompile Include="ASCIIFileAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ASCIIFileAdapter.cpp">
+    <ClCompile Include="XmlFileAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

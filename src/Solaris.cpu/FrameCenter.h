@@ -1,7 +1,7 @@
 #ifndef FRAMECENTER_H_
 #define FRAMECENTER_H_
 
-enum FrameCenter{
+enum FrameCenter {
 	FRAME_CENTER_ASTRO,
 	FRAME_CENTER_BARY,
 	FRAME_CENTER_N

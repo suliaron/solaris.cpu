@@ -2,6 +2,7 @@
 #define ACCELERATION_H_
 
 #include "IntegratorType.h"
+#include "FrameCenter.h"
 
 class BodyData;
 class Nebula;
@@ -13,7 +14,7 @@ class Vector;
 
 class Acceleration {
 public:
-	Acceleration(IntegratorType iType, bool baryCentric, BodyData *bD, Nebula *n);
+	Acceleration(IntegratorType iType, FrameCenter fCenter, BodyData *bD, Nebula *n);
 	~Acceleration();
 
 	int	Compute(            double t, double *y, double *totalAccel);
@@ -57,7 +58,7 @@ public:
 
 private:
 	IntegratorType	_integratorType;
-	bool			_baryCentric;
+	FrameCenter			_frameCenter;
 };
 
 #endif

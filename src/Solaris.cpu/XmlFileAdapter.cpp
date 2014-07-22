@@ -337,11 +337,11 @@ int XmlFileAdapter::DeserializeSettingsAttributes(TiXmlAttribute *attribute, Set
 		}
 	}
 	else if (attributeName == "barycentric") {
-		if (	attributeValue == "true")  {
-			settings->baryCentric = true;
+		if (	attributeValue == "astro")  {
+			settings->frame_center = FRAME_CENTER_ASTRO;
 		}
-		else if(attributeValue == "false") {
-			settings->baryCentric = false;
+		else if(attributeValue == "bary") {
+			settings->frame_center = FRAME_CENTER_BARY;
 		}
 		else {
 			_stream << "Invalid value: " << attribute->Name() << "=" << attribute->Value() << " at row: " << attribute->Row() << ", col: " << attribute->Column();

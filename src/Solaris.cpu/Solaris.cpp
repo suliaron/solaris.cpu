@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 
+#include "ASCIIFileAdapter.cpp"
 #include "BinaryFileAdapter.h"
 #include "Error.h"
 #include "FargoParameters.h"
@@ -81,6 +82,7 @@ int ProcessArgv(int argc, char* argv[], std::string &directory, std::string &fil
  * @param simulation the object where the input data will be stored
  * @return 0 on success 1 on error
  */
+/*
 int LoadInput(char* inputPath, Simulation &simulation)
 {
 	XmlFileAdapter xml(inputPath);
@@ -102,6 +104,31 @@ int LoadInput(char* inputPath, Simulation &simulation)
 			return 1;
         }
 	}
+
+	return 0;
+}
+*/
+int LoadInput(char* inputPath, Simulation &simulation)
+{
+	std::string str;
+	if (ReadFile(inputPath, &str) == 1) {
+		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		return 1;
+	}
+
+/*	if (XmlFileAdapter::DeserializeSimulation(xml.doc, simulation) == 1) {
+		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		return 1;
+	}
+
+	if (simulation.nebula != 0 && simulation.nebula->fargoPath.length() > 0) {
+		simulation.fargoParameters = new FargoParameters();
+		simulation.fargoParameters->ReadConfigFile(simulation.nebula->fargoPath);
+		if (simulation.fargoParameters->ParseConfig(true) == 1) {
+    		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+        }
+	}*/
 
 	return 0;
 }

@@ -33,10 +33,10 @@
 #define FIFTH(a)	((a)*(a)*(a)*(a)*(a))
 
 // TODO: Miért kell tudnia neki, hogy ki fogja integrálni? Elvileg neki tök mindegy!!
-Acceleration::Acceleration(IntegratorType iType, bool baryCentric, BodyData *bD, Nebula *n)
+Acceleration::Acceleration(IntegratorType iType, FrameCenter fCenter, BodyData *bD, Nebula *n)
 {
 	_integratorType			= iType;
-	_baryCentric			= baryCentric;
+	_frameCenter			= fCenter;
 	evaluateGasDrag			= true;
 	evaluateTypeIMigration	= true;
 	evaluateTypeIIMigration = true;
@@ -69,11 +69,11 @@ int	Acceleration::Compute(double t, double *y, double *totalAccel)
 		memset(rm3, 0, bodyData->nBodies.total*sizeof(double));
 	}
 
-	if (_baryCentric) {
+	if (_frameCenter == FRAME_CENTER_BARY) {
 		result = ComputeBaryCentric(t, y, totalAccel);
 		HANDLE_RESULT(result);
 	}
-	else {
+	else if (_frameCenter == FRAME_CENTER_ASTRO){
 		result = ComputeAstroCentric(t, y, totalAccel);
 		HANDLE_RESULT(result);
 	}

@@ -4,7 +4,7 @@
 #include "Output.h"
 
 Settings::Settings() :
-	baryCentric(false),
+	frame_center(FRAME_CENTER_ASTRO),
 	enableDistinctStartTimes(false),
 	integrator(0),
 	intgr_type(UNDEFINED),
