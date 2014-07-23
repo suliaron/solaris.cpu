@@ -111,7 +111,7 @@ int LoadInput(char* inputPath, Simulation &simulation)
 int LoadInput(char* inputPath, Simulation &simulation)
 {
 	std::string str;
-	if (ReadFile(inputPath, &str) == 1) {
+	if (ReadFile(inputPath, str) == 1) {
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}

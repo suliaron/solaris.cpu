@@ -16,7 +16,7 @@
 #include "Tokenizer.h"
 #include "Tools.h"
 
-int ReadFile(char* path, std::string *str)
+int ReadFile(char* path, std::string& str)
 {
 	std::ifstream file(path);
 	if (file) {
@@ -27,8 +27,8 @@ int ReadFile(char* path, std::string *str)
 				continue;
 			if (temp[0] == '#')
 				continue;
-			*str += temp;
-			str->push_back('\n');
+			str += temp;
+			str.push_back('\n');
 
 		} 	
 	}
@@ -40,7 +40,7 @@ int ReadFile(char* path, std::string *str)
 
 	return 0;
 }
-/*
+
 int SetSettings(std::string& key, std::string& value, Settings& settings, const bool verbose)
 {
 	TimeLine timeLine;
@@ -275,4 +275,3 @@ int	ParseSettings(Settings &settings, std::string& str, const bool verbose)
 
 	return 0;
 }
-*/
