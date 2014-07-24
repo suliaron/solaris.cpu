@@ -115,6 +115,10 @@ int LoadInput(char* inputPath, Simulation &simulation)
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
+	if (ParseSettings(simulation.settings, str, true) == 1) {
+    		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+        }
 
 /*	if (XmlFileAdapter::DeserializeSimulation(xml.doc, simulation) == 1) {
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -160,7 +164,7 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-    simulation.binary = new BinaryFileAdapter(&simulation.settings.output);
+  /*  simulation.binary = new BinaryFileAdapter(&simulation.settings.output);
 	simulation.binary->LogStartParameters(argc, argv);
 	simulation.binary->Log("Simulation data was successfully loaded and deserialized.", true);
 
@@ -188,6 +192,6 @@ int main(int argc, char* argv[])
 		Error::PrintStackTrace();
 		exit(1);
 	}
-
+	*/
 	return 0;
 }
