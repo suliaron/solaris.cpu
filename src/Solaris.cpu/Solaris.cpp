@@ -36,13 +36,27 @@ int ProcessArgv(int argc, char* argv[], std::string &directory, std::string &fil
 			std::cout << Constants::CodeName << ":" << std::endl << Constants::Usage;
 			exit(0);
 		}
-        else if (strcmp(argv[i], "-i") == 0) {
+        else if (strcmp(argv[i], "-is") == 0) {
             runType = "New";
 			i++;
 			std::string input(argv[i]);
 			directory = Tools::GetDirectory(input, Output::directorySeparator);
 			fileName  = Tools::GetFileName( input, Output::directorySeparator);
-        } 
+        }
+		else if (strcmp(argv[i], "-ib") == 0) {
+            runType = "New";
+			i++;
+			std::string input(argv[i]);
+			directory = Tools::GetDirectory(input, Output::directorySeparator);
+			fileName  = Tools::GetFileName( input, Output::directorySeparator);
+        }
+		else if (strcmp(argv[i], "-in") == 0) {
+            runType = "New";
+			i++;
+			std::string input(argv[i]);
+			directory = Tools::GetDirectory(input, Output::directorySeparator);
+			fileName  = Tools::GetFileName( input, Output::directorySeparator);
+        }
         else if (strcmp(argv[i], "-c") == 0) {
             runType = "Continue";
 			i++;
