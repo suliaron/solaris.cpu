@@ -23,6 +23,15 @@ Characteristics::Characteristics(double mass)
 	this->density	= 0.0;
 }
 
+Characteristics::Characteristics(double mass, double radius, double density, double stokes, double absVisMag)
+{
+	this->mass		= mass;
+	this->radius	= radius;
+	this->density	= density;
+	this->stokes	= stokes;	
+	this->absVisMag	= absVisMag;
+}
+
 Characteristics::Characteristics(const Characteristics &characteristics)
 {
 	mass		= characteristics.mass;

@@ -10,6 +10,7 @@ public:
 
 	Characteristics();
 	Characteristics(double mass);
+	Characteristics(double mass, double radius, double density, double stokes, double absVisMag);
 	Characteristics(const Characteristics &characteristics);
 
 	double CalculateDensity();

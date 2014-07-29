@@ -150,9 +150,6 @@
     <ClInclude Include="XmlFileAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FrameCenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>

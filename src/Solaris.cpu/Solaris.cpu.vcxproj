@@ -19,7 +19,6 @@
     <ClInclude Include="BodyGroupList.h" />
     <ClInclude Include="Calculate.h" />
     <ClInclude Include="Characteristics.h" />
-    <ClInclude Include="Common.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Counter.h" />
