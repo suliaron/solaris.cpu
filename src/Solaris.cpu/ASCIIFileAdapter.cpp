@@ -69,7 +69,7 @@ static int SetSettings(std::string& key, std::string& value, Settings& settings,
 			settings.frame_center = FRAME_CENTER_BARY;
 		}
 		else {
-			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::_errMsg = "Invalid value: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
@@ -329,6 +329,9 @@ static int SetSettings(std::string& key, std::string& value, Settings& settings,
 
 static int SetBodyGroupList(std::string& key, std::string& value, BodyGroupList& bodyGroupList, double& ratiosum, const bool verbose)
 {
+	//TODO: check if all position and velocity tags are set!
+	//TODO: check orbital element angle unit!
+
 	BodyGroup bodyGroup;
 	Body body;
 	Component component;
@@ -342,9 +345,20 @@ static int SetBodyGroupList(std::string& key, std::string& value, BodyGroupList&
 		bodyGroupList.items.back().description = value;
     } 
     else if (key == "bodygroup_epoch") {
+		if (Ephemeris::GetFormat(value) == UndefinedFormat) {
+			Error::_errMsg = "Undefined epoch format!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 		bodyGroupList.items.back().epoch = value;
+
     }
     else if (key == "bodygroup_offset") {
+		if (!Tools::IsNumber(value)) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 		bodyGroupList.items.back().offset = atof(value.c_str());
     }
     else if (key == "bodygroup_referenceframe") {
@@ -355,7 +369,6 @@ static int SetBodyGroupList(std::string& key, std::string& value, BodyGroupList&
     }
     else if (key == "bodygroup_body_type") {
 		bodyGroupList.items.back().items.push_back(body);
-		//body = bodyGroup.items.back();
 		if (value == "centralbody")				{ bodyGroupList.items.back().items.back().type = CentralBody;		 }
 		else if (value == "giantplanet")		{ bodyGroupList.items.back().items.back().type = GiantPlanet;		 }
 		else if (value == "rockyplanet")		{ bodyGroupList.items.back().items.back().type = RockyPlanet;		 }
@@ -370,7 +383,7 @@ static int SetBodyGroupList(std::string& key, std::string& value, BodyGroupList&
 		}
     }
 	else if (key == "bodygroup_body_name") {
-		bodyGroupList.items.back().items.back().name= value;
+		bodyGroupList.items.back().items.back().name = value;
 	}
 	else if (key == "bodygroup_body_mpcorbittype") {
 		if (     value == "aten")											{ bodyGroupList.items.back().items.back().mPCOrbitType = Aten;											}
@@ -415,6 +428,11 @@ static int SetBodyGroupList(std::string& key, std::string& value, BodyGroupList&
 		else if (value == "l3") { bodyGroupList.items.back().items.back().ln = L3; }
 		else if (value == "l4") { bodyGroupList.items.back().items.back().ln = L4; }
 		else if (value == "l5") { bodyGroupList.items.back().items.back().ln = L5; }
+		else {
+			Error::_errMsg = "Unknown ln!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
     }
 	else if (key == "bodygroup_body_guid") {
 		bodyGroupList.items.back().items.back().guid = value;
@@ -731,9 +749,9 @@ static int SetBodyGroupList(std::string& key, std::string& value, BodyGroupList&
 			return 1;
 		}
 		else if (body.type != SuperPlanetesimal && atof(value.c_str()) != 0 && bodyGroupList.items.back().items.back().characteristics->radius > 0) {
-		Error::_errMsg = "The radius and density of a body cannot be defined simultaneously!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+			Error::_errMsg = "The radius and density of a body cannot be defined simultaneously!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
 		}
 		else if (!bodyGroupList.items.back().items.back().characteristics) {
 			bodyGroupList.items.back().items.back().characteristics = new Characteristics();
@@ -821,7 +839,7 @@ static int SetNebula(std::string& key, std::string& value, Nebula* nebula, const
     else if (key == "description") {
 		nebula->description = value;
     }
-    else if (key == "path") {
+    else if (key == "fargopath") {
 		nebula->fargoPath = value;
     }
     else if (key == "gascomponent_alpha") {
@@ -859,6 +877,7 @@ static int SetNebula(std::string& key, std::string& value, Nebula* nebula, const
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
+		nebula->gasComponent.t0 = atof(value.c_str());
     }
     else if (key == "gascomponent_t1") {
 		if (!Tools::IsNumber(value)) {
@@ -866,6 +885,7 @@ static int SetNebula(std::string& key, std::string& value, Nebula* nebula, const
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
+		nebula->gasComponent.t1 = atof(value.c_str());
     }
     else if (key == "gascomponent_unit") {
 		double dummy = 0.0;

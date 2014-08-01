@@ -61,7 +61,7 @@ int UnitTool::TimeToDay(std::string unit, double& value)
 	else if (unit == "year" ) {
 		value *= Constants::YearToDay;
 	}
-	else if (unit == "second" ) {
+	else if (unit == "second" || unit == "sec" || unit == "s") {
 		value *= Constants::SecondToDay;
 	}
 	else {
