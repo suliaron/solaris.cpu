@@ -92,7 +92,7 @@ public:
 	OrbitalElement	*orbitalElement;
 	Characteristics	*characteristics;
 
-private:
+//private:
 	// id of the body instance
 	int			_id;
 
