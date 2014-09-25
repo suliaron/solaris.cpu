@@ -13,235 +13,234 @@
 #include "constants.h"
 #include "number_of_bodies.h"
 #include "file_util.h"
+#include "solaris.type.h"
 
-// NBody settings
-
-#define NDIM		4		// Number of dimensions, 4 to coalesce memory copies
-#define NTILE		256
-
-#define	NVAR		2		// Number of vector variables per body (coordinate, velocity)
-#define NPAR		2		// Number of parameters per body (mass, radius)
-
-#define K			(var_t)0.01720209895
-#define K2			(var_t)0.0002959122082855911025
-
-#define	PI			(var_t)3.1415926535897932384626
-#define	TWOPI		(var_t)6.2831853071795864769253
-#define	TORAD		(var_t)0.0174532925199432957692
-#define TODEG		(var_t)57.295779513082320876798
-
-// These macro functions must be enclosed in parentheses in order to give
-// correct results in the case of a division i.e. 1/SQR(x) -> 1/((x)*(x))
-#define	SQR(x)		((x)*(x))
-#define	CUBE(x)		((x)*(x)*(x))
-#define FORTH(x)	((x)*(x)*(x)*(x))
-#define FIFTH(x)	((x)*(x)*(x)*(x)*(x))
-
-#define MASS_STAR		1.0			// M_sol
-#define MASS_JUPITER	1.0e-3		// M_sol
-#define RAD_STAR		0.005		// AU
-
-#define MASS_SUN		1.9891E+30	// kg
-#define MASS_FACTOR		5e-7		// M_sol
-#define MASS_MU			log(4.0)
-#define MASS_S			0.3
-#define MASS_MIN		1.0e-20		// M_sol
-#define MASS_MAX		1.0e-19		// M_sol
-
-#define DIST_MIN		4.5			// AU
-#define DIST_MAX		15			// AU
-
-//#define DENSITY			3000.0		// kg m-3
-#define AU				149.6e9		// m
+//// NBody settings
+//
+//#define NDIM		4		// Number of dimensions, 4 to coalesce memory copies
+//#define NTILE		256
+//
+//#define	NVAR		2		// Number of vector variables per body (coordinate, velocity)
+//#define NPAR		2		// Number of parameters per body (mass, radius)
+//
+//#define K			(var_t)0.01720209895
+//#define K2			(var_t)0.0002959122082855911025
+//
+//#define	PI			(var_t)3.1415926535897932384626
+//#define	TWOPI		(var_t)6.2831853071795864769253
+//#define	TORAD		(var_t)0.0174532925199432957692
+//#define TODEG		(var_t)57.295779513082320876798
+//
+//// These macro functions must be enclosed in parentheses in order to give
+//// correct results in the case of a division i.e. 1/SQR(x) -> 1/((x)*(x))
+//#define	SQR(x)		((x)*(x))
+//#define	CUBE(x)		((x)*(x)*(x))
+//#define FORTH(x)	((x)*(x)*(x)*(x))
+//#define FIFTH(x)	((x)*(x)*(x)*(x)*(x))
+//
+//#define MASS_STAR		1.0			// M_sol
+//#define MASS_JUPITER	1.0e-3		// M_sol
+//#define RAD_STAR		0.005		// AU
+//
+//#define MASS_SUN		1.9891E+30	// kg
+//#define MASS_FACTOR		5e-7		// M_sol
+//#define MASS_MU			log(4.0)
+//#define MASS_S			0.3
+//#define MASS_MIN		1.0e-20		// M_sol
+//#define MASS_MAX		1.0e-19		// M_sol
+//
+//#define DIST_MIN		4.5			// AU
+//#define DIST_MAX		15			// AU
+//
+////#define DENSITY			3000.0		// kg m-3
+//#define AU				149.6e9		// m
 
 using namespace std;
 
 static string body_type_names[] = {"star", "giant", "rocky", "proto", "superpl", "pl", "testp"}; 
 
-typedef double		ttt_t;
-
-typedef double		var_t;
-
-struct double2
-{
-    double x, y;
-} double2;
-
-typedef struct var2
-	{
-		double x;
-		double y;
-	} var2_t;
-
-typedef struct vec
-	{
-		double x;
-		double y;
-		double z;
-	} vec_t;
-
-typedef bool		bool_t;
-
-typedef int			int_t;
-
-typedef struct int2
-	{
-		int x;
-		int y;
-	} int2_t;
-
-typedef enum body_type
-{
-BODY_TYPE_STAR,
-BODY_TYPE_GIANTPLANET,
-BODY_TYPE_ROCKYPLANET,
-BODY_TYPE_PROTOPLANET,
-BODY_TYPE_SUPERPLANETESIMAL,
-BODY_TYPE_PLANETESIMAL,
-BODY_TYPE_TESTPARTICLE,
-BODY_TYPE_N
-} body_type_t;
-
-typedef enum orbelem_name
-{
-SMA,
-ECC,
-INC,
-PERI,
-NODE,
-MEAN
-} orbelem_name_t;
-
-typedef enum phys_prop_name
-{
-MASS,
-RADIUS,
-DENSITY,
-DRAG_COEFF
-} phys_prop_name_t;
-
-
-
-	typedef struct orbelem
-{
-//! Semimajor-axis of the body
-var_t sma;
-//! Eccentricity of the body
-var_t ecc;
-//! Inclination of the body
-var_t inc;
-//! Argument of the pericenter
-var_t peri;
-//! Longitude of the ascending node
-var_t node;
-//! Mean anomaly
-var_t mean;
-} orbelem_t;
-
-typedef enum migration_type
-{
-MIGRATION_TYPE_NO,
-MIGRATION_TYPE_TYPE_I,
-MIGRATION_TYPE_TYPE_II
-} migration_type_t;
-
-typedef enum mpcorbit_type {
-    UndefinedMPCOrbitType						= 0,
-    Aten										= 2,
-    Apollo										= 3,
-    Amor										= 4,
-    ObjectWithqLt1_665							= 5,
-    Hungaria									= 6,
-    Phocaea										= 7,
-    Hilda										= 8,
-    JupiterTrojan								= 9,
-    Centaur										= 10,
-    Plutino										= 14,
-    OtherResonantTNO							= 15,
-    Cubewano									= 16,
-    ScatteredDisk								= 17,
-    ObjectIsNEO									= 2048,
-    ObjectIs1kmOrLargerNEO						= 4096,
-    OneOppositionObjectSeenAtEarlierOpposition	= 8192,
-    CriticalListNumberedObject					= 16384,
-    ObjectIsPHA									= 32768
-} mpcorbit_type_t;
-
-typedef enum ln {
-	UndefinedLn,
-	L1,
-	L2,
-	L3,
-	L4,
-	L5
-} ln_t;
-
-typedef struct distribution
-		{
-			var2_t	limits;
-			var_t	(*pdf)(var_t);
-		} distribution_t;
-
-typedef struct oe_dist
-		{
-			distribution_t	item[6];
-		} oe_dist_t;
-
-typedef struct phys_prop_dist
-		{
-			distribution_t	item[4];
-		} phys_prop_dist_t;
-
-typedef struct body_disk
-		{
-			vector<string>		names;
-			int_t				nBody[BODY_TYPE_N];
-			oe_dist_t			oe_d[BODY_TYPE_N];
-			phys_prop_dist_t	pp_d[BODY_TYPE_N];
-			migration_type_t	*mig_type;
-			var_t				*stop_at;
-		} body_disk_t;
-
-	typedef struct param
-{
-//! Unique number to identify the object
-int_t id;
-//! Type of the body
-body_type_t body_type;
-//! Indicates whether the body is participating in the simulation or not (i.e. escaped)
-bool active;
-//! The initial conditions are valid for this epoch
-var_t epoch;
-//! Mass of body in M_sol
-var_t mass;
-//! Radius of body in AU
-var_t radius;
-//! Density of body in M_sol AU-3
-var_t density;
-//! Drag coefficient for the Stokes-type drag
-var_t cd;
-//! Used for the drag force
-var_t gamma_stokes;
-//! Used for the drag force
-var_t gamma_epstein;
-//! Type of the migration
-migration_type_t mig_type;
-//! The migration stop at this distance measured from the star
-var_t mig_stop_at;
-
-string des;
-string provdes;
-mpcorbit_type_t mpcorbit_type;
-string ref;
-string opp;
-ln_t ln;
-var_t absvismag;
-int_t compnum;
-string* name;
-var_t* ratio;
-
-} param_t;
-
+//typedef double		ttt_t;
+//typedef double		var_t;
+//
+//struct double2
+//{
+//    double x, y;
+//} double2;
+//
+//typedef struct var2
+//	{
+//		double x;
+//		double y;
+//	} var2_t;
+//
+//typedef struct vec
+//	{
+//		double x;
+//		double y;
+//		double z;
+//	} vec_t;
+//
+//typedef bool		bool_t;
+//
+//typedef int			int_t;
+//
+//typedef struct int2
+//	{
+//		int x;
+//		int y;
+//	} int2_t;
+//
+//typedef enum body_type
+//{
+//BODY_TYPE_STAR,
+//BODY_TYPE_GIANTPLANET,
+//BODY_TYPE_ROCKYPLANET,
+//BODY_TYPE_PROTOPLANET,
+//BODY_TYPE_SUPERPLANETESIMAL,
+//BODY_TYPE_PLANETESIMAL,
+//BODY_TYPE_TESTPARTICLE,
+//BODY_TYPE_N
+//} body_type_t;
+//
+//typedef enum orbelem_name
+//{
+//SMA,
+//ECC,
+//INC,
+//PERI,
+//NODE,
+//MEAN
+//} orbelem_name_t;
+//
+//typedef enum phys_prop_name
+//{
+//MASS,
+//RADIUS,
+//DENSITY,
+//DRAG_COEFF
+//} phys_prop_name_t;
+//
+//
+//
+//	typedef struct orbelem
+//{
+////! Semimajor-axis of the body
+//var_t sma;
+////! Eccentricity of the body
+//var_t ecc;
+////! Inclination of the body
+//var_t inc;
+////! Argument of the pericenter
+//var_t peri;
+////! Longitude of the ascending node
+//var_t node;
+////! Mean anomaly
+//var_t mean;
+//} orbelem_t;
+//
+//typedef enum migration_type
+//		{
+//			MIGRATION_TYPE_NO,
+//			MIGRATION_TYPE_TYPE_I,
+//			MIGRATION_TYPE_TYPE_II
+//		} migration_type_t;
+//
+//typedef enum mpcorbit_type {
+//    MPCORBIT_TYPE_UNDEFINED						= 0,
+//    MPCORBIT_TYPE_ATEN							= 2,
+//    APOLLO										= 3,
+//    AMOR										= 4,
+//    OBJECTWITHQLT1_665							= 5,
+//    HUNGARIA									= 6,
+//    PHOCAEA										= 7,
+//    HILDA										= 8,
+//    JUPITERTROJAN								= 9,
+//    CENTAUR										= 10,
+//    PLUTINO										= 14,
+//    OTHERRESONANTTNO							= 15,
+//    CUBEWANO									= 16,
+//    SCATTEREDDISK								= 17,
+//    OBJECTISNEO									= 2048,
+//    OBJECTIS1KMORLARGERNEO						= 4096,
+//    ONEOPPOSITIONOBJECTSEENATEARLIEROPPOSITION	= 8192,
+//    CRITICALLISTNUMBEREDOBJECT					= 16384,
+//    OBJECTISPHA									= 32768
+//} mpcorbit_type_t;
+//
+//typedef enum ln {
+//	UndefinedLn,
+//	L1,
+//	L2,
+//	L3,
+//	L4,
+//	L5
+//} ln_t;
+//
+//typedef struct distribution
+//		{
+//			var2_t	limits;
+//			var_t	(*pdf)(var_t);
+//		} distribution_t;
+//
+//typedef struct oe_dist
+//		{
+//			distribution_t	item[6];
+//		} oe_dist_t;
+//
+//typedef struct phys_prop_dist
+//		{
+//			distribution_t	item[4];
+//		} phys_prop_dist_t;
+//
+//typedef struct body_disk
+//		{
+//			vector<string>		names;
+//			int_t				nBody[BODY_TYPE_N];
+//			oe_dist_t			oe_d[BODY_TYPE_N];
+//			phys_prop_dist_t	pp_d[BODY_TYPE_N];
+//			migration_type_t	*mig_type;
+//			var_t				*stop_at;
+//		} body_disk_t;
+//
+//typedef struct param
+//		{
+//			//! Unique number to identify the object
+//			int_t id;
+//			//! Type of the body
+//			body_type_t body_type;
+//			//! Indicates whether the body is participating in the simulation or not (i.e. escaped)
+//			bool active;
+//			//! The initial conditions are valid for this epoch
+//			var_t epoch;
+//			//! Mass of body in M_sol
+//			var_t mass;
+//			//! Radius of body in AU
+//			var_t radius;
+//			//! Density of body in M_sol AU-3
+//			var_t density;
+//			//! Drag coefficient for the Stokes-type drag
+//			var_t cd;
+//			//! Used for the drag force
+//			var_t gamma_stokes;
+//			//! Used for the drag force
+//			var_t gamma_epstein;
+//			//! Type of the migration
+//			migration_type_t mig_type;
+//			//! The migration stop at this distance measured from the star
+//			var_t mig_stop_at;
+//
+//			string des;
+//			string provdes;
+//			mpcorbit_type_t mpcorbit_type;
+//			string ref;
+//			string opp;
+//			ln_t ln;
+//			var_t absvismag;
+//			int_t compnum;
+//			string* name;
+//			var_t* ratio;
+//		} param_t;
+//
 
 var_t generate_random(var_t xmin, var_t xmax, var_t p(var_t))
 {
