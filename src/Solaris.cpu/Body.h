@@ -6,6 +6,7 @@
 #include "Phase.h"
 #include "OrbitalElement.h"
 #include "Characteristics.h"
+#include "solaris.type\solaris.type.h"
 
 class Phase;
 class OrbitalElement;
