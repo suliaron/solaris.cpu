@@ -86,7 +86,7 @@ BodyGroup::BodyGroup(std::string guid, std::string description, std::string epoc
 
 /// Counts how many bodies' type is equal to the specified type.
 /// The number of these bodies are returned. 
-int BodyGroup::CountBy(BodyType type)
+int BodyGroup::CountBy(body_type_t type)
 {
 	int	result = 0;
 	for (std::list<Body>::iterator bodyIterator = items.begin(); bodyIterator != items.end(); bodyIterator++) {
@@ -103,7 +103,7 @@ int BodyGroup::CountBy(double mass)
 {
     int result = 0;
 	for (std::list<Body>::iterator bodyIterator = items.begin(); bodyIterator != items.end(); bodyIterator++) {
-		if (bodyIterator->type == TestParticle)
+		if (bodyIterator->type == BODY_TYPE_TESTPARTICLE)
 			continue;
 		if (bodyIterator->characteristics->mass >= mass)
 			result++;
@@ -114,7 +114,7 @@ int BodyGroup::CountBy(double mass)
 
 /// Iterates over the Bodies and compares its type with the specified type.
 /// In case of equality the reference of the Body is added to the result.
-void BodyGroup::FindBy(BodyType type, std::list<Body *> &result)
+void BodyGroup::FindBy(body_type_t type, std::list<Body *> &result)
 {
 	for (std::list<Body>::iterator it = items.begin(); it != items.end(); it++) {
 		if (it->type == type) {
@@ -157,10 +157,10 @@ int BodyGroup::SetStartTime(double startTimeOfMainSimulation)
 bool BodyGroup::ContainsMassiveBody()
 {
 	for (std::list<Body>::iterator it = items.begin(); it != items.end(); it++) {
-		if (it->type == TestParticle)
+		if (it->type == BODY_TYPE_TESTPARTICLE)
 			continue;
 
-		if (it->type != CentralBody && it->characteristics->mass > 0)
+		if (it->type != BODY_TYPE_STAR && it->characteristics->mass > 0)
 			return true;
 	}
 	return false;

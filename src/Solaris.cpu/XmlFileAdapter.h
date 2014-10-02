@@ -73,7 +73,7 @@ public:
 	static int DeserializeVelocity(TiXmlElement *xmlElement, Vector& v);
 	static int DeserializeVector(TiXmlElement *xmlElement, Vector& vector);
 	static int DeserializeOrbitalElement(TiXmlElement *xmlElement, OrbitalElement *oe);
-	static int DeserializeCharacteristics(TiXmlElement *xmlElement, Characteristics *characteristics, BodyType bodyType);
+//	static int DeserializeCharacteristics(TiXmlElement *xmlElement, Characteristics *characteristics, BodyType bodyType);
 	static int DeserializeCharacteristicsAttributes(TiXmlAttribute *attribute, Characteristics *characteristics);
 	static int DeserializeComponentList(TiXmlElement *xmlElement, std::list<Component> *componentList);
 	static int DeserializeComponent(TiXmlElement *xmlElement, Component *component);

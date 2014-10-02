@@ -10,237 +10,15 @@
 #include <sstream>
 #include <vector>
 
-#include "constants.h"
-#include "number_of_bodies.h"
-#include "file_util.h"
-#include "solaris.type.h"
+#include "Constants.h"
+#include "FileUtil.h"
+#include "SolarisType.h"
+#include "SolarisMacro.h"
 
-//// NBody settings
-//
-//#define NDIM		4		// Number of dimensions, 4 to coalesce memory copies
-//#define NTILE		256
-//
-//#define	NVAR		2		// Number of vector variables per body (coordinate, velocity)
-//#define NPAR		2		// Number of parameters per body (mass, radius)
-//
-//#define K			(var_t)0.01720209895
-//#define K2			(var_t)0.0002959122082855911025
-//
-//#define	PI			(var_t)3.1415926535897932384626
-//#define	TWOPI		(var_t)6.2831853071795864769253
-//#define	TORAD		(var_t)0.0174532925199432957692
-//#define TODEG		(var_t)57.295779513082320876798
-//
-//// These macro functions must be enclosed in parentheses in order to give
-//// correct results in the case of a division i.e. 1/SQR(x) -> 1/((x)*(x))
-//#define	SQR(x)		((x)*(x))
-//#define	CUBE(x)		((x)*(x)*(x))
-//#define FORTH(x)	((x)*(x)*(x)*(x))
-//#define FIFTH(x)	((x)*(x)*(x)*(x)*(x))
-//
-//#define MASS_STAR		1.0			// M_sol
-//#define MASS_JUPITER	1.0e-3		// M_sol
-//#define RAD_STAR		0.005		// AU
-//
-//#define MASS_SUN		1.9891E+30	// kg
-//#define MASS_FACTOR		5e-7		// M_sol
-//#define MASS_MU			log(4.0)
-//#define MASS_S			0.3
-//#define MASS_MIN		1.0e-20		// M_sol
-//#define MASS_MAX		1.0e-19		// M_sol
-//
-//#define DIST_MIN		4.5			// AU
-//#define DIST_MAX		15			// AU
-//
-////#define DENSITY			3000.0		// kg m-3
-//#define AU				149.6e9		// m
 
 using namespace std;
 
 static string body_type_names[] = {"star", "giant", "rocky", "proto", "superpl", "pl", "testp"}; 
-
-//typedef double		ttt_t;
-//typedef double		var_t;
-//
-//struct double2
-//{
-//    double x, y;
-//} double2;
-//
-//typedef struct var2
-//	{
-//		double x;
-//		double y;
-//	} var2_t;
-//
-//typedef struct vec
-//	{
-//		double x;
-//		double y;
-//		double z;
-//	} vec_t;
-//
-//typedef bool		bool_t;
-//
-//typedef int			int_t;
-//
-//typedef struct int2
-//	{
-//		int x;
-//		int y;
-//	} int2_t;
-//
-//typedef enum body_type
-//{
-//BODY_TYPE_STAR,
-//BODY_TYPE_GIANTPLANET,
-//BODY_TYPE_ROCKYPLANET,
-//BODY_TYPE_PROTOPLANET,
-//BODY_TYPE_SUPERPLANETESIMAL,
-//BODY_TYPE_PLANETESIMAL,
-//BODY_TYPE_TESTPARTICLE,
-//BODY_TYPE_N
-//} body_type_t;
-//
-//typedef enum orbelem_name
-//{
-//SMA,
-//ECC,
-//INC,
-//PERI,
-//NODE,
-//MEAN
-//} orbelem_name_t;
-//
-//typedef enum phys_prop_name
-//{
-//MASS,
-//RADIUS,
-//DENSITY,
-//DRAG_COEFF
-//} phys_prop_name_t;
-//
-//
-//
-//	typedef struct orbelem
-//{
-////! Semimajor-axis of the body
-//var_t sma;
-////! Eccentricity of the body
-//var_t ecc;
-////! Inclination of the body
-//var_t inc;
-////! Argument of the pericenter
-//var_t peri;
-////! Longitude of the ascending node
-//var_t node;
-////! Mean anomaly
-//var_t mean;
-//} orbelem_t;
-//
-//typedef enum migration_type
-//		{
-//			MIGRATION_TYPE_NO,
-//			MIGRATION_TYPE_TYPE_I,
-//			MIGRATION_TYPE_TYPE_II
-//		} migration_type_t;
-//
-//typedef enum mpcorbit_type {
-//    MPCORBIT_TYPE_UNDEFINED						= 0,
-//    MPCORBIT_TYPE_ATEN							= 2,
-//    APOLLO										= 3,
-//    AMOR										= 4,
-//    OBJECTWITHQLT1_665							= 5,
-//    HUNGARIA									= 6,
-//    PHOCAEA										= 7,
-//    HILDA										= 8,
-//    JUPITERTROJAN								= 9,
-//    CENTAUR										= 10,
-//    PLUTINO										= 14,
-//    OTHERRESONANTTNO							= 15,
-//    CUBEWANO									= 16,
-//    SCATTEREDDISK								= 17,
-//    OBJECTISNEO									= 2048,
-//    OBJECTIS1KMORLARGERNEO						= 4096,
-//    ONEOPPOSITIONOBJECTSEENATEARLIEROPPOSITION	= 8192,
-//    CRITICALLISTNUMBEREDOBJECT					= 16384,
-//    OBJECTISPHA									= 32768
-//} mpcorbit_type_t;
-//
-//typedef enum ln {
-//	UndefinedLn,
-//	L1,
-//	L2,
-//	L3,
-//	L4,
-//	L5
-//} ln_t;
-//
-//typedef struct distribution
-//		{
-//			var2_t	limits;
-//			var_t	(*pdf)(var_t);
-//		} distribution_t;
-//
-//typedef struct oe_dist
-//		{
-//			distribution_t	item[6];
-//		} oe_dist_t;
-//
-//typedef struct phys_prop_dist
-//		{
-//			distribution_t	item[4];
-//		} phys_prop_dist_t;
-//
-//typedef struct body_disk
-//		{
-//			vector<string>		names;
-//			int_t				nBody[BODY_TYPE_N];
-//			oe_dist_t			oe_d[BODY_TYPE_N];
-//			phys_prop_dist_t	pp_d[BODY_TYPE_N];
-//			migration_type_t	*mig_type;
-//			var_t				*stop_at;
-//		} body_disk_t;
-//
-//typedef struct param
-//		{
-//			//! Unique number to identify the object
-//			int_t id;
-//			//! Type of the body
-//			body_type_t body_type;
-//			//! Indicates whether the body is participating in the simulation or not (i.e. escaped)
-//			bool active;
-//			//! The initial conditions are valid for this epoch
-//			var_t epoch;
-//			//! Mass of body in M_sol
-//			var_t mass;
-//			//! Radius of body in AU
-//			var_t radius;
-//			//! Density of body in M_sol AU-3
-//			var_t density;
-//			//! Drag coefficient for the Stokes-type drag
-//			var_t cd;
-//			//! Used for the drag force
-//			var_t gamma_stokes;
-//			//! Used for the drag force
-//			var_t gamma_epstein;
-//			//! Type of the migration
-//			migration_type_t mig_type;
-//			//! The migration stop at this distance measured from the star
-//			var_t mig_stop_at;
-//
-//			string des;
-//			string provdes;
-//			mpcorbit_type_t mpcorbit_type;
-//			string ref;
-//			string opp;
-//			ln_t ln;
-//			var_t absvismag;
-//			int_t compnum;
-//			string* name;
-//			var_t* ratio;
-//		} param_t;
-//
 
 var_t generate_random(var_t xmin, var_t xmax, var_t p(var_t))
 {
@@ -259,7 +37,7 @@ var_t generate_random(var_t xmin, var_t xmax, var_t p(var_t))
 
 var_t pdf_mass_lognormal(var_t x)
 {
-	return 1.0 / sqrt(2 * PI) / MASS_S * exp(-pow(log(x) - MASS_MU, 2) / 2 / MASS_S / MASS_MU);
+	return 1.0 / sqrt(2 * Constants::Pi) / MASS_S * exp(-pow(log(x) - MASS_MU, 2) / 2 / MASS_S / MASS_MU);
 }
 
 var_t pdf_distance_squared(var_t d)
@@ -277,10 +55,10 @@ var_t pdf_const(var_t x)
 	return 1;
 }
 
-#define FOUR_PI_OVER_THREE	4.1887902047863909846168578443727
+
 var_t calculate_radius(var_t m, var_t density)
 {
-	return pow(1.0/FOUR_PI_OVER_THREE * m/density, 1.0/3.0);
+	return pow(1.0/Constants::FourPiOverThree * m/density, 1.0/3.0);
 }
 
 var_t calculate_density(var_t m, var_t R)
@@ -289,18 +67,17 @@ var_t calculate_density(var_t m, var_t R)
 	{
 		return 0.0;
 	}
-	return m / (FOUR_PI_OVER_THREE * CUBE(R));
+	return m / (Constants::FourPiOverThree * CUBE(R));
 }
 
 var_t caclulate_mass(var_t R, var_t density)
 {
-	return FOUR_PI_OVER_THREE * CUBE(R) * density;
+	return Constants::FourPiOverThree * CUBE(R) * density;
 }
-#undef FOUR_PI_OVER_THREE
 
 int_t	kepler_equation_solver(var_t ecc, var_t mean, var_t eps, var_t* E)
 {
-	if (ecc == 0.0 || mean == 0.0 || mean == PI) {
+	if (ecc == 0.0 || mean == 0.0 || mean == Constants::Pi) {
         *E = mean;
 		return 0;
     }
@@ -363,19 +140,20 @@ int_t	calculate_phase(var_t mu, const orbelem_t* oe, vec_t* rVec, vec_t* vVec)
 	return 0;
 }
 
-void print_body_record(ofstream &output, string name, var_t epoch, param_t *param, vec_t *r, vec_t *v, int precision)
+void print_body_record(ofstream &output, string name, param_t *param, vec_t *r, vec_t *v, int precision)
 {
 	static char sep = '|';
 
 	int type = static_cast<body_type_t>(param->body_type);
 
+
 	output << endl;
-	output << "body = " << setprecision(precision) << param->id << sep << name << sep << param->des << sep << param->provdes << sep;
-	output << param->body_type << sep << param->mpcorbit_type << sep << param->mig_type << sep << param->mig_stop_at << sep;
-	output << param->ref << sep << param->opp << sep << param->ln << sep << r->x << sep << r->y << sep << r->z << sep;
-	output << v->x << sep << v->y << sep << v->z << sep << param->absvismag << sep << param->cd << sep << param->mass << sep;
-	output << param->radius << sep << param->density << sep << param->compnum;
-	//if(param->compnum){
+	output << "body = " << setprecision(precision) << setw(4) << param->id << sep <<  setw(10) << name << sep << setw(10) << param->des << sep << setw(10) <<  param->provdes << sep;
+	output << setw(1) <<  param->body_type << sep << setw(5) <<  param->mpcorbit_type << sep << setw(1) <<  param->mig_type << sep << setw(6) <<  param->mig_stop_at << sep;
+	output << setw(10) <<  param->ref << sep << setw(10) <<  param->opp << sep << setw(1) <<  param->ln << sep << setw(10) << r->x << sep << setw(10) << r->y << sep << setw(10) << r->z << sep;
+	output << setw(10) << v->x << sep << setw(10) << v->y << sep << setw(10) << v->z << sep << setw(6) << param->absvismag << sep << setw(10) << param->cd << sep << setw(10) << param->mass << sep;
+	output << setw(10) << param->radius << sep << setw(10) << param->density << sep << setw(3) << param->compnum;
+	//if(param->compnum > 0){
 	//	param->name = new string[param->compnum];
 	//	param->ratio = new var_t[param->compnum];
 
@@ -442,59 +220,69 @@ int_t	calculate_number_of_bodies(body_disk &bd)
 
 void generate_oe(oe_dist_t oe_d, orbelem_t& oe)
 {
-	oe.sma  = generate_random(oe_d.item[SMA].limits.x,  oe_d.item[SMA].limits.y,  oe_d.item[SMA].pdf);
-	oe.ecc  = generate_random(oe_d.item[ECC].limits.x,  oe_d.item[ECC].limits.y,  oe_d.item[ECC].pdf);
-	oe.inc  = generate_random(oe_d.item[INC].limits.x,  oe_d.item[INC].limits.y,  oe_d.item[INC].pdf);
-	oe.peri = generate_random(oe_d.item[PERI].limits.x, oe_d.item[PERI].limits.y, oe_d.item[PERI].pdf);
-	oe.node = generate_random(oe_d.item[NODE].limits.x, oe_d.item[NODE].limits.y, oe_d.item[NODE].pdf);
-	oe.mean = generate_random(oe_d.item[MEAN].limits.x, oe_d.item[MEAN].limits.y, oe_d.item[MEAN].pdf);
+	oe.sma  = generate_random(oe_d.item[ORBELEM_NAME_SMA].limits.x,  oe_d.item[ORBELEM_NAME_SMA].limits.y,  oe_d.item[ORBELEM_NAME_SMA].pdf);
+	oe.ecc  = generate_random(oe_d.item[ORBELEM_NAME_ECC].limits.x,  oe_d.item[ORBELEM_NAME_ECC].limits.y,  oe_d.item[ORBELEM_NAME_ECC].pdf);
+	oe.inc  = generate_random(oe_d.item[ORBELEM_NAME_INC].limits.x,  oe_d.item[ORBELEM_NAME_INC].limits.y,  oe_d.item[ORBELEM_NAME_INC].pdf);
+	oe.peri = generate_random(oe_d.item[ORBELEM_NAME_PERI].limits.x, oe_d.item[ORBELEM_NAME_PERI].limits.y, oe_d.item[ORBELEM_NAME_PERI].pdf);
+	oe.node = generate_random(oe_d.item[ORBELEM_NAME_NODE].limits.x, oe_d.item[ORBELEM_NAME_NODE].limits.y, oe_d.item[ORBELEM_NAME_NODE].pdf);
+	oe.mean = generate_random(oe_d.item[ORBELEM_NAME_MEAN].limits.x, oe_d.item[ORBELEM_NAME_MEAN].limits.y, oe_d.item[ORBELEM_NAME_MEAN].pdf);
 }
 
 void generate_pp(phys_prop_dist_t pp_d, param_t& param)
 {
-	param.mass = generate_random(pp_d.item[MASS].limits.x, pp_d.item[MASS].limits.y, pp_d.item[MASS].pdf);
+	param.mass = generate_random(pp_d.item[PHYS_PROP_NAME_MASS].limits.x, pp_d.item[PHYS_PROP_NAME_MASS].limits.y, pp_d.item[PHYS_PROP_NAME_MASS].pdf);
 
-	if (	 pp_d.item[DENSITY].limits.x == 0.0 && pp_d.item[DENSITY].limits.y == 0.0 &&
-			 pp_d.item[RADIUS].limits.x == 0.0 && pp_d.item[RADIUS].limits.y == 0.0 )
+	if (	 pp_d.item[PHYS_PROP_NAME_DENSITY].limits.x == 0.0 && pp_d.item[PHYS_PROP_NAME_DENSITY].limits.y == 0.0 &&
+			 pp_d.item[PHYS_PROP_NAME_RADIUS].limits.x == 0.0 && pp_d.item[PHYS_PROP_NAME_RADIUS].limits.y == 0.0 )
 	{
 		param.radius = 0.0;
 		param.density = 0.0;
 	}
-	else if (pp_d.item[DENSITY].limits.x == 0.0 && pp_d.item[DENSITY].limits.y == 0.0 &&
-			 pp_d.item[RADIUS].limits.x > 0.0 && pp_d.item[RADIUS].limits.y > 0.0 )
+	else if (pp_d.item[PHYS_PROP_NAME_DENSITY].limits.x == 0.0 && pp_d.item[PHYS_PROP_NAME_DENSITY].limits.y == 0.0 &&
+			 pp_d.item[PHYS_PROP_NAME_RADIUS].limits.x > 0.0 && pp_d.item[PHYS_PROP_NAME_RADIUS].limits.y > 0.0 )
 	{
-		param.radius = generate_random(pp_d.item[RADIUS].limits.x, pp_d.item[RADIUS].limits.y, pp_d.item[RADIUS].pdf);
+		param.radius = generate_random(pp_d.item[PHYS_PROP_NAME_RADIUS].limits.x, pp_d.item[PHYS_PROP_NAME_RADIUS].limits.y, pp_d.item[PHYS_PROP_NAME_RADIUS].pdf);
 		param.density = calculate_density(param.mass, param.radius);
 	}
-	else if (pp_d.item[DENSITY].limits.x > 0.0 && pp_d.item[DENSITY].limits.y > 0.0 &&
-			 pp_d.item[RADIUS].limits.x == 0.0 && pp_d.item[RADIUS].limits.y == 0.0 )
+	else if (pp_d.item[PHYS_PROP_NAME_DENSITY].limits.x > 0.0 && pp_d.item[PHYS_PROP_NAME_DENSITY].limits.y > 0.0 &&
+			 pp_d.item[PHYS_PROP_NAME_RADIUS].limits.x == 0.0 && pp_d.item[PHYS_PROP_NAME_RADIUS].limits.y == 0.0 )
 	{
-		param.density = generate_random(pp_d.item[DENSITY].limits.x, pp_d.item[DENSITY].limits.y, pp_d.item[DENSITY].pdf);
+		param.density = generate_random(pp_d.item[PHYS_PROP_NAME_DENSITY].limits.x, pp_d.item[PHYS_PROP_NAME_DENSITY].limits.y, pp_d.item[PHYS_PROP_NAME_DENSITY].pdf);
 		param.radius = calculate_radius(param.mass, param.density);
 	}
 	else
 	{
-		param.radius = generate_random(pp_d.item[RADIUS].limits.x, pp_d.item[RADIUS].limits.y, pp_d.item[RADIUS].pdf);
-		param.density = generate_random(pp_d.item[DENSITY].limits.x, pp_d.item[DENSITY].limits.y, pp_d.item[DENSITY].pdf);
+		param.radius = generate_random(pp_d.item[PHYS_PROP_NAME_RADIUS].limits.x, pp_d.item[PHYS_PROP_NAME_RADIUS].limits.y, pp_d.item[PHYS_PROP_NAME_RADIUS].pdf);
+		param.density = generate_random(pp_d.item[PHYS_PROP_NAME_DENSITY].limits.x, pp_d.item[PHYS_PROP_NAME_DENSITY].limits.y, pp_d.item[PHYS_PROP_NAME_DENSITY].pdf);
 	}
 
-	param.cd = generate_random(pp_d.item[DRAG_COEFF].limits.x, pp_d.item[DRAG_COEFF].limits.y, pp_d.item[DRAG_COEFF].pdf);
+	param.cd = generate_random(pp_d.item[PHYS_PROP_NAME_DRAG_COEFF].limits.x, pp_d.item[PHYS_PROP_NAME_DRAG_COEFF].limits.y, pp_d.item[PHYS_PROP_NAME_DRAG_COEFF].pdf);
+}
+
+void set_param(param_t& param)
+{
+	param.absvismag = 0;
+	param.compnum = 0;
+	param.ln = LN_UNDEFINED;
+	param.mpcorbit_type = MPCORBIT_TYPE_UNDEFINED;
 }
 
 int generate_pp_disk(string &path, body_disk_t& body_disk)
 {
-	static const int precision = 3;
+	static const int precision = 4;
 
 	ofstream	output(path, ios_base::app);
 	if (output)
 	{
-		var_t	t = 0.0;
 		vec_t	rVec = {0.0, 0.0, 0.0};
 		vec_t	vVec = {0.0, 0.0, 0.0};
 		
 		param_t	param0;
 		param_t	param;
 		orbelem_t	oe;
+
+		set_param(param0);
+		set_param(param);
 
 		int_t bodyId = 0;
 		for (int body_type = BODY_TYPE_STAR; body_type < BODY_TYPE_N; body_type++)
@@ -511,7 +299,7 @@ int generate_pp_disk(string &path, body_disk_t& body_disk)
 					generate_pp(body_disk.pp_d[body_type], param0);
 					param0.mig_type = body_disk.mig_type[bodyId];
 					param0.mig_stop_at = body_disk.stop_at[bodyId];
-					print_body_record(output, body_disk.names[bodyId], t, &param0, &rVec, &vVec, precision);
+					print_body_record(output, body_disk.names[bodyId], &param0, &rVec, &vVec, precision);
 				}
 				else 
 				{
@@ -524,14 +312,14 @@ int generate_pp_disk(string &path, body_disk_t& body_disk)
 					param.mig_type = body_disk.mig_type[bodyId];
 					param.mig_stop_at = body_disk.stop_at[bodyId];
 
-					var_t mu = K2*(param0.mass + param.mass);
+					var_t mu = Constants::Gauss2*(param0.mass + param.mass);
 					int_t ret_code = calculate_phase(mu, &oe, &rVec, &vVec);
 					if (ret_code == 1) {
 						cerr << "Could not calculate the phase." << endl;
 						return ret_code;
 					}
 
-					print_body_record(output, body_disk.names[bodyId], t, &param, &rVec, &vVec, precision);
+					print_body_record(output, body_disk.names[bodyId], &param, &rVec, &vVec, precision);
 				}
 			}
 		}
@@ -566,9 +354,9 @@ void set_parameters_of_Dvorak_disk(body_disk_t& disk)
 	int type = BODY_TYPE_STAR;
 
 	disk.names.push_back("star");
-	set(disk.pp_d[type].item[MASS], 1.0, pdf_const);
-	set(disk.pp_d[type].item[RADIUS], 1.0 * Constants::SolarRadiusToAu, pdf_const);
-	set(disk.pp_d[type].item[DRAG_COEFF], 0.0, pdf_const);
+	set(disk.pp_d[type].item[PHYS_PROP_NAME_MASS], 1.0, pdf_const);
+	set(disk.pp_d[type].item[PHYS_PROP_NAME_RADIUS], 1.0 * Constants::SolarRadiusToAu, pdf_const);
+	set(disk.pp_d[type].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
 	disk.mig_type[body_id] = MIGRATION_TYPE_NO;
 	disk.stop_at[body_id] = 0.0;
 
@@ -580,16 +368,16 @@ void set_parameters_of_Dvorak_disk(body_disk_t& disk)
 
 	type = BODY_TYPE_PROTOPLANET;
 	{
-		set(disk.oe_d[type].item[SMA], 0.9, 2.5, pdf_const);
-		set(disk.oe_d[type].item[ECC], 0.0, 0.3, pdf_const);
-		set(disk.oe_d[type].item[INC], 0.0, pdf_const);
-		set(disk.oe_d[type].item[PERI], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
-		set(disk.oe_d[type].item[NODE], 0.0, pdf_const);
-		set(disk.oe_d[type].item[MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(disk.oe_d[type].item[ORBELEM_NAME_SMA], 0.9, 2.5, pdf_const);
+		set(disk.oe_d[type].item[ORBELEM_NAME_ECC], 0.0, 0.3, pdf_const);
+		set(disk.oe_d[type].item[ORBELEM_NAME_INC], 0.0, pdf_const);
+		set(disk.oe_d[type].item[ORBELEM_NAME_PERI], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(disk.oe_d[type].item[ORBELEM_NAME_NODE], 0.0, pdf_const);
+		set(disk.oe_d[type].item[ORBELEM_NAME_MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
 
-		set(disk.pp_d[type].item[MASS], mCeres, mMoon/10.0, pdf_mass_lognormal);
-		set(disk.pp_d[type].item[DENSITY], rhoBasalt, pdf_const);
-		set(disk.pp_d[type].item[DRAG_COEFF], 0.0, pdf_const);
+		set(disk.pp_d[type].item[PHYS_PROP_NAME_MASS], mCeres, mMoon/10.0, pdf_mass_lognormal);
+		set(disk.pp_d[type].item[PHYS_PROP_NAME_DENSITY], rhoBasalt, pdf_const);
+		set(disk.pp_d[type].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
 
 		for (int i = 0; i < disk.nBody[type]; i++, body_id++) 
 		{
@@ -642,9 +430,8 @@ int parse_options(int argc, const char **argv, number_of_bodies **nBodies, strin
 	return 0;
 }
 */
-//-o D:\Work\Projects\solaris.cuda\TestRun\Dvorak_disk -f Dvorak_disk.txt
-// 
-//-o C:\Work\Projects\solaris.cuda\TestRun\Dvorak_disk_Emese -f collision-testdata-N10001-vecelem-binary.dat
+
+
 int main(int argc, const char **argv)
 {
 	body_disk_t disk;
@@ -677,7 +464,7 @@ int main(int argc, const char **argv)
 	set_default(test_disk);
 
 	test_disk.nBody[BODY_TYPE_STAR] = 1;
-	test_disk.nBody[BODY_TYPE_GIANTPLANET] = 2;
+	test_disk.nBody[BODY_TYPE_GIANTPLANET] = 1;
 	test_disk.nBody[BODY_TYPE_ROCKYPLANET] = 0;
 	test_disk.nBody[BODY_TYPE_PROTOPLANET] = 0;
 	test_disk.nBody[BODY_TYPE_SUPERPLANETESIMAL] = 0;
@@ -691,9 +478,9 @@ int main(int argc, const char **argv)
 	int	index_of_body = 0;
 
 	test_disk.names.push_back("star");
-	set(test_disk.pp_d[BODY_TYPE_STAR].item[MASS], 1.0, pdf_const);
-	set(test_disk.pp_d[BODY_TYPE_STAR].item[RADIUS], 1.0 * Constants::SolarRadiusToAu, pdf_const);
-	set(test_disk.pp_d[BODY_TYPE_STAR].item[DRAG_COEFF], 0.0, pdf_const);
+	set(test_disk.pp_d[BODY_TYPE_STAR].item[PHYS_PROP_NAME_MASS], 1.0, pdf_const);
+	set(test_disk.pp_d[BODY_TYPE_STAR].item[PHYS_PROP_NAME_RADIUS], 1.0 * Constants::SolarRadiusToAu, pdf_const);
+	set(test_disk.pp_d[BODY_TYPE_STAR].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
 	test_disk.mig_type[index_of_body] = MIGRATION_TYPE_NO;
 	test_disk.stop_at[index_of_body] = 0.0;
 
@@ -706,22 +493,22 @@ int main(int argc, const char **argv)
 		test_disk.names.push_back(name);
 		convert.str("");
 
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[SMA], 1.0, 4.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ECC], 0.0, 0.2, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[INC], 0.0, 30.0 * Constants::DegreeToRadian, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[PERI], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[NODE], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_SMA], 1.0, 4.0, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_ECC], 0.0, 0.2, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_INC], 0.0, 30.0 * Constants::DegreeToRadian, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_PERI], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_NODE], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
 
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[MASS], 1.0 * Constants::JupiterToSolar, 2.0 * Constants::JupiterToSolar, pdf_mass_lognormal);
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[DENSITY], 0.7 * Constants::GramPerCm3ToSolarPerAu3, 1.2 * Constants::GramPerCm3ToSolarPerAu3, pdf_mass_lognormal);
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[DRAG_COEFF], 0.0, pdf_const);
-		test_disk.mig_type[index_of_body] = MIGRATION_TYPE_TYPE_II;
-		test_disk.stop_at[index_of_body] = 0.4;
+		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_MASS], 1.0 * Constants::JupiterToSolar, 2.0 * Constants::JupiterToSolar, pdf_mass_lognormal);
+		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_DENSITY], 0.7 * Constants::GramPerCm3ToSolarPerAu3, 1.2 * Constants::GramPerCm3ToSolarPerAu3, pdf_mass_lognormal);
+		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
+		test_disk.mig_type[index_of_body] = MIGRATION_TYPE_NO;
+		test_disk.stop_at[index_of_body] = 0.0;
 	}
 
 	outDir = "E:\\Work\\ELTE\\Test";
-	generate_pp_disk(combine_path(outDir, "test_disk.txt"), test_disk);
+	generate_pp_disk(combine_path(outDir, "test_disk2.txt"), test_disk);
 
 	delete[] test_disk.mig_type;
 	delete[] test_disk.stop_at;

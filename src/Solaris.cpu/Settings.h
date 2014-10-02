@@ -1,10 +1,9 @@
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 
-#include "FrameCenter.h"
 #include "Integrator.h"
-#include "IntegratorType.h"
 #include "Output.h"
+#include "SolarisType.h"
 
 class EventCondition;
 class TimeLine;
@@ -14,10 +13,10 @@ class Settings
 public:
 	Settings();
 
-	bool			enableDistinctStartTimes;
-	FrameCenter		frame_center;
-	Integrator		*integrator;
-	IntegratorType	intgr_type;
+	bool				enableDistinctStartTimes;
+	frame_center_t		frame_center;
+	Integrator			*integrator;
+	integrator_type_t	intgr_type;
 
 	Output			output;
 	TimeLine		*timeLine;

@@ -16,10 +16,10 @@ public:
 	BodyGroup(std::string guid, std::string description, std::string epoch, double offest);
 	BodyGroup(std::string guid, std::string description, std::string epoch, double offest, std::string referenceFrame);
 
-	int		CountBy(BodyType type);
+	int		CountBy(body_type_t type);
 	int		CountBy(double mass);
 	
-	void	FindBy(BodyType type, std::list<Body *> &result);
+	void	FindBy(body_type_t type, std::list<Body *> &result);
 
 	int		ToBodyList(std::list<Body *> &result);
 

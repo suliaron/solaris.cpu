@@ -4,11 +4,11 @@
 #include <list>
 
 #include "Counter.h"
-#include "IntegratorType.h"
 #include "BinaryFileAdapter.h"
 #include "BodyData.h"
 #include "BodyGroup.h"
 #include "Event.h"
+#include "SolarisType.h"
 
 class Acceleration;
 class RungeKutta4;
@@ -26,13 +26,13 @@ public:
     int     Continue();
 	int		Run();
 
-	IntegratorType			integratorType;
-	RungeKuttaFehlberg78	*rungeKuttaFehlberg78;
-	RungeKutta4				*rungeKutta4;
-	DormandPrince			*dormandPrince;
+	integrator_type_t			integratorType;
+	RungeKuttaFehlberg78		*rungeKuttaFehlberg78;
+	RungeKutta4					*rungeKutta4;
+	DormandPrince				*dormandPrince;
 
-	BodyData				bodyData;
-	Counter					counter;
+	BodyData					bodyData;
+	Counter						counter;
 	BinaryFileAdapter::OutputType outputType;
 
 private:
@@ -45,7 +45,7 @@ private:
 
 	int		Insert(double time, std::list<BodyGroup>::iterator &bgIt);
 	int		Insert(double time, std::list<BodyGroup *>::iterator &bgIt);
-	int		SetIteratorAfter(BodyType type, std::list<Body *>::iterator& it);
+	int		SetIteratorAfter(body_type_t type, std::list<Body *>::iterator& it);
 	int		PopulateBodyList(double time);
 
 	double	ShortestPeriod();

@@ -1,16 +1,22 @@
 ﻿#ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
-#define	SQR(x)		((x)*(x))
-#define	CUBE(x)		((x)*(x)*(x))
+#include <string>
+#include "SolarisMacro.h"
 
 namespace Constants
 {
+	const std::string CodeName		      = "Solaris";
+	const std::string Version		      = "1.0";
+
+	const std::string Usage				  = "Usage is -is <settings file> -ib <bodygrouplist file> -in <nebula file> | -c <settings file> <bodygrouplist file> <nebula file>\n";
+
 	const int	 CheckForSM			      = 100;
 	const double SmallestNumber		      = 1.0e-50;
 
 	const double Pi					      = 3.14159265358979323846;
 	const double SqrtTwoPi			      = 2.50662827463100024161;
+	const double FourPiOverThree		  = 4.1887902047863909846168578443727;
 
 	const double Boltzman_SI		      = 1.3806488e-23;			        // J/K = (kg m^2) / (s^2 K)
 	const double ProtonMass_SI		      = 1.672621777e-27;		        // kg

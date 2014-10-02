@@ -5,8 +5,8 @@
 #include "Constants.h"
 #include "Phase.h"
 #include "Vector.h"
+#include "SolarisMacro.h"
 
-#define SQR(a)		((a)*(a))
 
 // TODO: implement
 void Calculate::TransformToAC(Phase *phase, Phase *phaseOfBC)

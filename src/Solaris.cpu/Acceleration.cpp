@@ -9,31 +9,32 @@
 #include "Error.h"
 #include "Event.h"
 #include "EventCondition.h"
-#include "IntegratorType.h"
 #include "Nebula.h"
+#include "SolarisMacro.h"
+#include "SolarisType.h"
 #include "Tools.h"
 #include "TwoBodyAffair.h"
 
-#define HANDLE_NULL(a) \
-	if ((a) == NULL) { \
-		Error::_errMsg = "host memory allocation"; \
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
-        return 1; \
-	}
-
-#define HANDLE_RESULT(result) \
-	if (result == 1) { \
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
-		return 1; \
-	}
-
-#define SQR(a)		((a)*(a))
-#define CUBE(a)		((a)*(a)*(a))
-#define FORTH(a)	((a)*(a)*(a)*(a))
-#define FIFTH(a)	((a)*(a)*(a)*(a)*(a))
+//#define HANDLE_NULL(a) \
+//	if ((a) == NULL) { \
+//		Error::_errMsg = "host memory allocation"; \
+//		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
+//        return 1; \
+//	}
+//
+//#define HANDLE_RESULT(result) \
+//	if (result == 1) { \
+//		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
+//		return 1; \
+//	}
+//
+//#define SQR(a)		((a)*(a))
+//#define CUBE(a)		((a)*(a)*(a))
+//#define FORTH(a)	((a)*(a)*(a)*(a))
+//#define FIFTH(a)	((a)*(a)*(a)*(a)*(a))
 
 // TODO: Miért kell tudnia neki, hogy ki fogja integrálni? Elvileg neki tök mindegy!!
-Acceleration::Acceleration(IntegratorType iType, FrameCenter fCenter, BodyData *bD, Nebula *n)
+Acceleration::Acceleration(integrator_type_t iType, frame_center_t fCenter, BodyData *bD, Nebula *n)
 {
 	_integratorType			= iType;
 	_frameCenter			= fCenter;
@@ -118,7 +119,7 @@ int Acceleration::ComputeBaryCentric(double t, double *y, double *totalAccel)
 		lower = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 		upper = bodyData->nBodies.NOfMassive();
 		for (int i=lower; i<upper; i++) {
-			if (bodyData->migType[i] == No) {
+			if (bodyData->migType[i] == MIGRATION_TYPE_NO) {
 				continue;
 			}
 			int	i0 = 6*i;
@@ -140,7 +141,7 @@ int Acceleration::ComputeBaryCentric(double t, double *y, double *totalAccel)
 		lower = bodyData->nBodies.centralBody;
 		upper = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 		for (int i=lower; i<upper; i++) {
-			if (bodyData->migType[i] == No) {
+			if (bodyData->migType[i] == MIGRATION_TYPE_NO) {
 				continue;
 			}
 			int	i0 = 6*i;
@@ -210,7 +211,7 @@ int Acceleration::ComputeAstroCentric(double t, double *y, double *totalAccel)
 		lower = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 		upper = bodyData->nBodies.NOfMassive();
 		for (int i=lower; i<upper; i++) {
-			if (bodyData->migType[i] == No) {
+			if (bodyData->migType[i] == MIGRATION_TYPE_NO) {
 				continue;
 			}
 			int	i0 = 6*i;
@@ -232,7 +233,7 @@ int Acceleration::ComputeAstroCentric(double t, double *y, double *totalAccel)
 		lower = bodyData->nBodies.centralBody;
 		upper = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 		for (int i=lower; i<upper; i++) {
-			if (bodyData->migType[i] == No) {
+			if (bodyData->migType[i] == MIGRATION_TYPE_NO) {
 				continue;
 			}
 			int	i0 = 6*i;
@@ -283,7 +284,7 @@ int	Acceleration::GravityAC(double t, double *y, double *accel)
 		accel[i0 + 4] = -mu*rm3[i]*y[i0 + 1]; 
 		accel[i0 + 5] = -mu*rm3[i]*y[i0 + 2]; 
 
-		if (bodyData->type[i] <= ProtoPlanet) {
+		if (bodyData->type[i] <= BODY_TYPE_PROTOPLANET) {
 			NOfMassive = bodyData->nBodies.NOfMassive() + bodyData->nBodies.superPlanetsimal;
 		} else {
 			NOfMassive = bodyData->nBodies.NOfMassive();
@@ -428,7 +429,7 @@ int Acceleration::MigrationTypeIAC(double t, double *y, double *accel)
 	int lower = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 	int upper = bodyData->nBodies.NOfMassive();
 	for (int i=lower; i<upper;  i++) {
-		if (bodyData->migType[i] != TypeI) {
+		if (bodyData->migType[i] != MIGRATION_TYPE_TYPE_I) {
 			continue;
 		}
 
@@ -438,7 +439,7 @@ int Acceleration::MigrationTypeIAC(double t, double *y, double *accel)
 		double r = sqrt(r2);
 		if (r <= bodyData->migStopAt[i]) {
 			accel[j0 + 0] = accel[j0 + 1] = accel[j0 + 2] = 0.0;
-			bodyData->migType[i] = No;
+			bodyData->migType[i] = MIGRATION_TYPE_NO;
 			continue;
 		}
 
@@ -491,7 +492,7 @@ int Acceleration::MigrationTypeIIAC(double t, double *y, double *accel)
 	int lower = bodyData->nBodies.centralBody;
 	int upper = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 	for (int i=lower; i<upper; i++) {
-		if (bodyData->migType[i] != TypeII) {
+		if (bodyData->migType[i] != MIGRATION_TYPE_TYPE_II) {
 			continue;
 		}
 
@@ -500,7 +501,7 @@ int Acceleration::MigrationTypeIIAC(double t, double *y, double *accel)
 		double r2 = SQR(y[i0 + 0]) + SQR(y[i0 + 1]) + SQR(y[i0 + 2]);
 		double r = sqrt(r2);
 		if (r <= bodyData->migStopAt[i]) {
-			bodyData->migType[i] = No;
+			bodyData->migType[i] = MIGRATION_TYPE_NO;
 			accel[j0 + 0] = accel[j0 + 1] = accel[j0 + 2] = 0.0;
 			continue;
 		}
@@ -649,7 +650,7 @@ int	Acceleration::MigrationTypeIBC(double t, double *y, double *accel)
 	int lower = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 	int upper = bodyData->nBodies.NOfMassive();
 	for (int i=lower; i<upper;  i++) {
-		if (bodyData->migType[i] != TypeI) {
+		if (bodyData->migType[i] != MIGRATION_TYPE_TYPE_I) {
 			continue;
 		}
 
@@ -659,7 +660,7 @@ int	Acceleration::MigrationTypeIBC(double t, double *y, double *accel)
 		double r = sqrt(r2);
 		if (r <= bodyData->migStopAt[i]) {
 			accel[j0 + 0] = accel[j0 + 1] = accel[j0 + 2] = 0.0;
-			bodyData->migType[i] = No;
+			bodyData->migType[i] = MIGRATION_TYPE_NO;
 			continue;
 		}
 
@@ -720,7 +721,7 @@ int	Acceleration::MigrationTypeIIBC(double t, double *y, double *accel)
 	int lower = bodyData->nBodies.centralBody;
 	int upper = bodyData->nBodies.centralBody + bodyData->nBodies.giantPlanet;
 	for (int i=lower; i<upper; i++) {
-		if (bodyData->migType[i] != TypeII) {
+		if (bodyData->migType[i] != MIGRATION_TYPE_TYPE_II) {
 			continue;
 		}
 
@@ -729,7 +730,7 @@ int	Acceleration::MigrationTypeIIBC(double t, double *y, double *accel)
 		double r2 = SQR(y[i0 + 0]) + SQR(y[i0 + 1]) + SQR(y[i0 + 2]);
 		double r = sqrt(r2);
 		if (r <= bodyData->migStopAt[i]) {
-			bodyData->migType[i] = No;
+			bodyData->migType[i] = MIGRATION_TYPE_NO;
 			accel[j0 + 0] = accel[j0 + 1] = accel[j0 + 2] = 0.0;
 			continue;
 		}

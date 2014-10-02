@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <string>
 
 #include "BodyGroupList.h"
 #include "Component.h"
@@ -16,6 +17,7 @@
 #include "RungeKuttaFehlberg78.h"
 #include "Settings.h"
 #include "Simulation.h"
+#include "SolarisType.h"
 #include "TimeLine.h"
 #include "Tokenizer.h"
 #include "Tools.h"
@@ -97,19 +99,19 @@ static int SetSettings(std::string& key, std::string& value, Settings& settings,
     }
     else if (key == "integrator_name") {
 		if (value == "rungekutta4" || value == "rk4") {
-			settings.intgr_type = RUNGE_KUTTA4;
+			settings.intgr_type = INTEGRATOR_TYPE_RUNGE_KUTTA4;
 			settings.integrator = new RungeKutta4();
 		}
 		else if (value == "rungekutta56" || value == "rk56") {
-			settings.intgr_type = RUNGE_KUTTA56;
+			settings.intgr_type = INTEGRATOR_TYPE_RUNGE_KUTTA56;
 //			settings.integrator = new RungeKutta56();
 		}
 		else if (value == "rungekuttafehlberg78" || value == "rk78" || value == "rungekutta78") {
-			settings.intgr_type = RUNGE_KUTTA_FEHLBERG78;
+			settings.intgr_type = INTEGRATOR_TYPE_RUNGE_KUTTA_FEHLBERG78;
 			settings.integrator = new RungeKuttaFehlberg78();
 		}
 		else if (value == "dormandprince" || value == "rkn76") {
-			settings.intgr_type = DORMAND_PRINCE;
+			settings.intgr_type = INTEGRATOR_TYPE_DORMAND_PRINCE;
 			settings.integrator = new DormandPrince();
 		}
 		else {
@@ -341,37 +343,44 @@ static int SetBody(std::string& bodystring, Body& body)
 	std::string value;
 	
 	value = bodyTokenizer.next();
-	if (!Tools::IsNumber(value)) {
-		Error::_errMsg = "Invalid number: '" + value + "'!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+	std::size_t pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
 	body._id = atoi(value.c_str());
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		body.name = value;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		body.name = value.substr(pos);
 	}
 	
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		body.designation = value;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		body.designation = value.substr(pos);
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		body.provisionalDesignation = value;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		body.provisionalDesignation = value.substr(pos);
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (value == "centralbody")				{ body.type = CentralBody;		 }
-		else if (value == "giantplanet")		{ body.type = GiantPlanet;		 }
-		else if (value == "rockyplanet")		{ body.type = RockyPlanet;		 }
-		else if (value == "protoplanet")		{ body.type = ProtoPlanet;		 }
-		else if (value == "superplanetesimal")	{ body.type = SuperPlanetesimal; }
-		else if (value == "planetesimal")		{ body.type = Planetesimal;		 }
-		else if (value == "testparticle")		{ body.type = TestParticle;		 }
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (value.substr(pos) == "1")			{ body.type = BODY_TYPE_STAR;				 }
+		else if (value.substr(pos) == "2")		{ body.type = BODY_TYPE_GIANTPLANET;		 }
+		else if (value.substr(pos) == "3")		{ body.type = BODY_TYPE_ROCKYPLANET;		 }
+		else if (value.substr(pos) == "4")		{ body.type = BODY_TYPE_PROTOPLANET;		 }
+		else if (value.substr(pos) == "5")		{ body.type = BODY_TYPE_SUPERPLANETESIMAL;	 }
+		else if (value.substr(pos) == "6")		{ body.type = BODY_TYPE_PLANETESIMAL;		 }
+		else if (value.substr(pos) == "7")		{ body.type = BODY_TYPE_TESTPARTICLE;		 }
 		else {
 			Error::_errMsg = "Unknown body type!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -380,25 +389,27 @@ static int SetBody(std::string& bodystring, Body& body)
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (     value == "aten")											{ body.mPCOrbitType = Aten;											}
-		else if (value == "apollo")											{ body.mPCOrbitType = Apollo;										}
-		else if (value == "amor")											{ body.mPCOrbitType = Amor;											}
-		else if (value == "objectwithqlt1_665")								{ body.mPCOrbitType = ObjectWithqLt1_665;							}
-		else if (value == "hungaria")										{ body.mPCOrbitType = Hungaria;										}
-		else if (value == "phocaea")										{ body.mPCOrbitType = Phocaea;										}
-		else if (value == "hilda")											{ body.mPCOrbitType = Hilda;										}
-		else if (value == "jupitertrojan")									{ body.mPCOrbitType = JupiterTrojan;								}
-		else if (value == "centaur")										{ body.mPCOrbitType = Centaur;										}
-		else if (value == "plutino")										{ body.mPCOrbitType = Plutino;										}
-		else if (value == "otherresonanttno")								{ body.mPCOrbitType = OtherResonantTNO;								}
-		else if (value == "cubewano")										{ body.mPCOrbitType = Cubewano;										}
-		else if (value == "scattereddisk")									{ body.mPCOrbitType = ScatteredDisk;								}
-		else if (value == "objectisneo")									{ body.mPCOrbitType = ObjectIsNEO;									}
-		else if (value == "objectis1kmorlargerneo")							{ body.mPCOrbitType = ObjectIs1kmOrLargerNEO;						}
-		else if (value == "oneoppositionobjectseenatearlieropposition")		{ body.mPCOrbitType = OneOppositionObjectSeenAtEarlierOpposition;	}
-		else if (value == "criticallistnumberedobject")						{ body.mPCOrbitType = CriticalListNumberedObject;					}
-		else if (value == "objectispha")									{ body.mPCOrbitType = ObjectIsPHA;									}
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (     value.substr(pos) == "0")							{ body.mPCOrbitType = MPCORBIT_TYPE_UNDEFINED;										}
+		else if (value.substr(pos) == "2")							{ body.mPCOrbitType = MPCORBIT_TYPE_ATEN;											}
+		else if (value.substr(pos) == "3")							{ body.mPCOrbitType = MPCORBIT_TYPE_APOLLO;											}
+		else if (value.substr(pos) == "4")							{ body.mPCOrbitType = MPCORBIT_TYPE_AMOR;											}
+		else if (value.substr(pos) == "5")							{ body.mPCOrbitType = MPCORBIT_TYPE_OBJECTWITHQLT1_665;								}
+		else if (value.substr(pos) == "6")							{ body.mPCOrbitType = MPCORBIT_TYPE_HUNGARIA;										}
+		else if (value.substr(pos) == "7")							{ body.mPCOrbitType = MPCORBIT_TYPE_PHOCAEA;										}
+		else if (value.substr(pos) == "8")							{ body.mPCOrbitType = MPCORBIT_TYPE_HILDA;											}
+		else if (value.substr(pos) == "9")							{ body.mPCOrbitType = MPCORBIT_TYPE_JUPITERTROJAN;									}
+		else if (value.substr(pos) == "10")							{ body.mPCOrbitType = MPCORBIT_TYPE_CENTAUR;										}
+		else if (value.substr(pos) == "14")							{ body.mPCOrbitType = MPCORBIT_TYPE_PLUTINO;										}
+		else if (value.substr(pos) == "15")							{ body.mPCOrbitType = MPCORBIT_TYPE_OTHERRESONANTTNO;								}
+		else if (value.substr(pos) == "16")							{ body.mPCOrbitType = MPCORBIT_TYPE_CUBEWANO;										}
+		else if (value.substr(pos) == "17")							{ body.mPCOrbitType = MPCORBIT_TYPE_SCATTEREDDISK;									}
+		else if (value.substr(pos) == "2048")						{ body.mPCOrbitType = MPCORBIT_TYPE_OBJECTISNEO;									}
+		else if (value.substr(pos) == "4096")						{ body.mPCOrbitType = MPCORBIT_TYPE_OBJECTIS1KMORLARGERNEO;							}
+		else if (value.substr(pos) == "8192")						{ body.mPCOrbitType = MPCORBIT_TYPE_ONEOPPOSITIONOBJECTSEENATEARLIEROPPOSITION;		}
+		else if (value.substr(pos) == "16384")						{ body.mPCOrbitType = MPCORBIT_TYPE_CRITICALLISTNUMBEREDOBJECT;						}
+		else if (value.substr(pos) == "32768")						{ body.mPCOrbitType = MPCORBIT_TYPE_OBJECTISPHA;									}
 		else {
 			Error::_errMsg = "Unknown body MPCOrbitType!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -407,9 +418,11 @@ static int SetBody(std::string& bodystring, Body& body)
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (     value == "i")  { body.migrationType = TypeI;  }
-		else if (value == "ii") { body.migrationType = TypeII; }
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (     value.substr(pos) == "0")  { body.migrationType = MIGRATION_TYPE_NO;  }
+		else if (value.substr(pos) == "1")  { body.migrationType = MIGRATION_TYPE_TYPE_I;  }
+		else if (value.substr(pos) == "2")  { body.migrationType = MIGRATION_TYPE_TYPE_II; }
 		else {
 			Error::_errMsg = "Unknown migration type";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -418,37 +431,45 @@ static int SetBody(std::string& bodystring, Body& body)
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (!Tools::IsNumber(value)) {
-			Error::_errMsg = "Invalid number: '" + value + "'!";
-			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-			return 1;
+	if (body.migrationType != MIGRATION_TYPE_NO) {
+		pos = value.find_first_not_of(' ');
+		if (pos != string::npos) {
+			if (!Tools::IsNumber(value.substr(pos))) {
+				Error::_errMsg = "Invalid number: '" + value + "'!";
+				Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+				return 1;
+			}
+			else if (!Validator::GreaterThan(0.0, atof(value.substr(pos).c_str()))) {
+				Error::_errMsg = "Value out of range";
+				Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+				return 1;
+			}
+			body.migrationStopAt = atof(value.substr(pos).c_str());
 		}
-		else if (!Validator::GreaterThan(0.0, atof(value.c_str()))) {
-			Error::_errMsg = "Value out of range";
-			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-			return 1;
-		}
-		body.migrationStopAt = atof(value.c_str());
 	}
 	
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		body.reference = value;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		body.reference = value.substr(pos);
+	}
+	
+
+	value = bodyTokenizer.next();
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		body.opposition = value.substr(pos);
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		body.opposition = value;
-	}
-
-	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (     value == "l1") { body.ln = L1; }
-		else if (value == "l2") { body.ln = L2; }
-		else if (value == "l3") { body.ln = L3; }
-		else if (value == "l4") { body.ln = L4; }
-		else if (value == "l5") { body.ln = L5; }
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (     value.substr(pos) == "0") { body.ln = LN_UNDEFINED; }
+		else if (value.substr(pos) == "1") { body.ln = LN_L1; }
+		else if (value.substr(pos) == "2") { body.ln = LN_L2; }
+		else if (value.substr(pos) == "3") { body.ln = LN_L3; }
+		else if (value.substr(pos) == "4") { body.ln = LN_L4; }
+		else if (value.substr(pos) == "5") { body.ln = LN_L5; }
 		else {
 			Error::_errMsg = "Unknown ln!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -457,57 +478,76 @@ static int SetBody(std::string& bodystring, Body& body)
 	}
 
 	value = bodyTokenizer.next();
-	if (!Tools::IsNumber(value)) {
-		Error::_errMsg = "Invalid number: '" + value + "'!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
 	body.phase = new Phase(body.GetId());
-	body.phase->position.x =  atof(value.c_str());
+	body.phase->position.x =  atof(value.substr(pos).c_str());
 
 	value = bodyTokenizer.next();
-	if (!Tools::IsNumber(value)) {
-		Error::_errMsg = "Invalid number: '" + value + "'!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
-	body.phase->position.y =  atof(value.c_str());
+	body.phase->position.y =  atof(value.substr(pos).c_str());
 
 	value = bodyTokenizer.next();
-	if (!Tools::IsNumber(value)) {
-		Error::_errMsg = "Invalid number: '" + value + "'!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
-	body.phase->position.z =  atof(value.c_str());
+	body.phase->position.z =  atof(value.substr(pos).c_str());
 
 	value = bodyTokenizer.next();
-	if (!Tools::IsNumber(value)) {
-		Error::_errMsg = "Invalid number: '" + value + "'!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
-	body.phase->velocity.x =  atof(value.c_str());
+	body.phase->velocity.x =  atof(value.substr(pos).c_str());
 
 	value = bodyTokenizer.next();
-	if (!Tools::IsNumber(value)) {
-		Error::_errMsg = "Invalid number: '" + value + "'!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
-	body.phase->velocity.y =  atof(value.c_str());
+	body.phase->velocity.y =  atof(value.substr(pos).c_str());
 
 	value = bodyTokenizer.next();
-	if (!Tools::IsNumber(value)) {
-		Error::_errMsg = "Invalid number: '" + value + "'!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
+			Error::_errMsg = "Invalid number: '" + value + "'!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
 	}
-	body.phase->velocity.z =  atof(value.c_str());
+	body.phase->velocity.z =  atof(value.substr(pos).c_str());
 		
 	value = bodyTokenizer.next();
-	if (value != " "){
-		if (!Tools::IsNumber(value)) {
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
@@ -515,17 +555,18 @@ static int SetBody(std::string& bodystring, Body& body)
 		else if (!body.characteristics) {
 			body.characteristics = new Characteristics();
 		}
-		body.characteristics->absVisMag = atof(value.c_str());
+		body.characteristics->absVisMag = atof(value.substr(pos).c_str());
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (!Tools::IsNumber(value)) {
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.c_str()))) {
+		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.substr(pos).c_str()))) {
 			Error::_errMsg = "Value out of range";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
@@ -533,17 +574,18 @@ static int SetBody(std::string& bodystring, Body& body)
 		else if (!body.characteristics) {
 			body.characteristics = new Characteristics();
 		}
-		body.characteristics->stokes = atof(value.c_str());
+		body.characteristics->stokes = atof(value.substr(pos).c_str());
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (!Tools::IsNumber(value)) {
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.c_str()))) {
+		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.substr(pos).c_str()))) {
 			Error::_errMsg = "Value out of range";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
@@ -551,17 +593,18 @@ static int SetBody(std::string& bodystring, Body& body)
 		else if (!body.characteristics) {
 			body.characteristics = new Characteristics();
 		}
-		body.characteristics->mass = atof(value.c_str());
+		body.characteristics->mass = atof(value.substr(pos).c_str());
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (!Tools::IsNumber(value)) {
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.c_str()))) {
+		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.substr(pos).c_str()))) {
 			Error::_errMsg = "Value out of range";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
@@ -569,69 +612,78 @@ static int SetBody(std::string& bodystring, Body& body)
 		else if (!body.characteristics) {
 			body.characteristics = new Characteristics();
 		}
-		body.characteristics->radius = atof(value.c_str());
+		body.characteristics->radius = atof(value.substr(pos).c_str());
 	}
 
 	value = bodyTokenizer.next();
-	if (value != " ") {
-		if (!Tools::IsNumber(value)) {
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		if (!Tools::IsNumber(value.substr(pos))) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.c_str()))) {
+		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.substr(pos).c_str()))) {
 			Error::_errMsg = "Value out of range";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (body.type != SuperPlanetesimal && atof(value.c_str()) != 0 && body.characteristics->radius > 0) {
-			Error::_errMsg = "The radius and density of a body cannot be defined simultaneously!";
-			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-			return 1;
-		}
+		//else if (body.type != BODY_TYPE_SUPERPLANETESIMAL && atof(value.substr(pos).c_str()) != 0 && body.characteristics->radius > 0) {
+		//	Error::_errMsg = "The radius and density of a body cannot be defined simultaneously!";
+		//	Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		//	return 1;
+		//}
 		else if (!body.characteristics) {
 			body.characteristics = new Characteristics();
 		}
-		body.characteristics->density = atof(value.c_str());
+		body.characteristics->density = atof(value.substr(pos).c_str());
 	}
 
 	value = bodyTokenizer.next();
-	if (value != "0") {
-		compnum = atoi(value.c_str());
-		for (2*compnum ; compnum > 0 ; compnum--) {
-			value = bodyTokenizer.next();
-			body.characteristics->componentList.push_back(component);
-			body.characteristics->componentList.back().name = value;
+	pos = value.find_first_not_of(' ');
+	if (pos != string::npos) {
+		value = value.substr(pos);
+		if (value != "0") {
+			compnum = atoi(value.c_str());
+			for (compnum*2 ; compnum > 0 ; compnum--) {
+				value = bodyTokenizer.next();
+				body.characteristics->componentList.push_back(component);
+				body.characteristics->componentList.back().name = value;
 
-			value = bodyTokenizer.next();
-			if (!Tools::IsNumber(value)) {
-				Error::_errMsg = "Invalid number: '" + value + "'!";
+				value = bodyTokenizer.next();
+				pos = value.find_first_not_of(' ');
+				if (pos != string::npos) {
+					value = value.substr(pos);
+					if (!Tools::IsNumber(value)) {
+						Error::_errMsg = "Invalid number: '" + value + "'!";
+						Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+						return 1;
+					}
+					else if (!Validator::ElementOfAndContainsEndPoints(0.0, 100.0, atof(value.c_str()))) {
+						Error::_errMsg = "Value out of range";
+						Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+						return 1;
+					}
+					body.characteristics->componentList.back().ratio = atof(value.c_str());
+					ratiosum -= atof(value.c_str());
+				}
+			}
+			if (bodyTokenizer.next() != "") {
+				Error::_errMsg = "Invalid number of components";
 				Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 				return 1;
 			}
-			else if (!Validator::ElementOfAndContainsEndPoints(0.0, 100.0, atof(value.c_str()))) {
-				Error::_errMsg = "Value out of range";
-				Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-				return 1;
+			else if (fabs(ratiosum) > 1.0e-4 ) {
+			Error::_errMsg = "The sum of the ComponentList tag is not 100%!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
 			}
-			body.characteristics->componentList.back().ratio = atof(value.c_str());
-			ratiosum -= atof(value.c_str());
 		}
-		if (bodyTokenizer.next() != "") {
+		else if (bodyTokenizer.next() != "") {
 			Error::_errMsg = "Invalid number of components";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (fabs(ratiosum) > 1.0e-4 ) {
-		Error::_errMsg = "The sum of the ComponentList tag is not 100%!";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
-		}
-	}
-	else if (bodyTokenizer.next() != "") {
-		Error::_errMsg = "Invalid number of components";
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
 	}
 
 	return 0;
@@ -639,9 +691,6 @@ static int SetBody(std::string& bodystring, Body& body)
 
 static int SetBodyGroupList(std::string& key, std::string& value, BodyGroupList& bodyGroupList, const bool verbose)
 {
-	//TODO: check if all position and velocity tags are set!
-	//TODO: check orbital element angle unit!
-
 	BodyGroup bodyGroup;
 	Body body;
 	
@@ -1401,15 +1450,15 @@ static int	ParseBodyGroupList(BodyGroupList &bodyGroupList, std::string& str, co
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
-	else if (bodyGroupList.items.back().items.back().type == UndefinedBodyType) {
+	else if (bodyGroupList.items.back().items.back().type == BODY_TYPE_UNDEFINED) {
 		Error::_errMsg = "The 'type' attribute is obligatory!";
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
-	else if (bodyGroupList.items.back().items.back().type == CentralBody && bodyGroupList.items.back().items.back().phase == 0 && bodyGroupList.items.back().items.back().orbitalElement == 0) {
+	else if (bodyGroupList.items.back().items.back().type == BODY_TYPE_STAR && bodyGroupList.items.back().items.back().phase == 0 && bodyGroupList.items.back().items.back().orbitalElement == 0) {
 		bodyGroupList.items.back().items.back().phase= new Phase(bodyGroupList.items.back().items.back().GetId());
 	}
-	else if (bodyGroupList.items.back().items.back().type == TestParticle && bodyGroupList.items.back().items.back().characteristics != 0 && bodyGroupList.items.back().items.back().migrationType != No) {
+	else if (bodyGroupList.items.back().items.back().type == BODY_TYPE_TESTPARTICLE && bodyGroupList.items.back().items.back().characteristics != 0 && bodyGroupList.items.back().items.back().migrationType != MIGRATION_TYPE_NO) {
 		Error::_errMsg = "You cannot define Characteristics and MigrationType tags for TestParticle type body!";
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;

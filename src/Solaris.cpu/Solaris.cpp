@@ -13,7 +13,6 @@
 #include "Settings.h"
 #include "TimeLine.h"
 #include "Tools.h"
-#include "XmlFileAdapter.h"
 
 /**
  * It will iterate over argv[] to get the parameters.
@@ -153,7 +152,7 @@ int LoadInput(char* inputPathSettings, char* inputPathBodyGroupList, char* input
     		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
     }
-	std::string nebula;
+	/*std::string nebula;
 	if (ReadFile(inputPathNebula, nebula) == 1) {
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
@@ -162,7 +161,7 @@ int LoadInput(char* inputPathSettings, char* inputPathBodyGroupList, char* input
 	if (ParseNebula(simulation.nebula, nebula, true) == 1) {
     		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
-    }
+    }*/
 
 /*	if (XmlFileAdapter::DeserializeSimulation(xml.doc, simulation) == 1) {
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -237,11 +236,11 @@ int main(int argc, char* argv[])
 		  //  exit(1);
 	   // }
     //}
-/*
+
 	if (simulator.Run() == 1) {
 		Error::PrintStackTrace();
 		exit(1);
 	}
-	*/
+	
 	return 0;
 }

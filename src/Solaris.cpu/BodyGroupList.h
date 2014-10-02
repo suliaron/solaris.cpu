@@ -23,9 +23,9 @@ public:
 	void	DistinctStartTimes(std::list<double> &startTimes, bool increasing);
 	int		DistinctStartTimesOfMassiveBodies(int &count);
 
-	int		CountBy(BodyType type);
+	int		CountBy(body_type_t type);
 
-	void	FindBy(BodyType type, std::list<Body *> &result);
+	void	FindBy(body_type_t type, std::list<Body *> &result);
 	void	FindBy(double startTime, std::list<BodyGroup *> &result);
 
 	bool	GetBodyGroupWithMassiveBodies(std::list<BodyGroup>::iterator &it);

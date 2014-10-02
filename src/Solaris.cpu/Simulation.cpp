@@ -7,6 +7,7 @@
 #include "Integrator.h"
 #include "Simulation.h"
 #include "Settings.h"
+#include "SolarisType.h"
 #include "TimeLine.h"
 
 Simulation::Simulation()
@@ -141,10 +142,10 @@ int Simulation::SetPhasesRadiiDensity()
 	for (std::list<BodyGroup>::iterator bgIt = this->bodyGroupList.items.begin(); bgIt != this->bodyGroupList.items.end(); bgIt++) {
 		for (std::list<Body>::iterator bIt = bgIt->items.begin(); bIt != bgIt->items.end(); bIt++) {
 
-			BodyType type = bIt->type;
-			if (type != CentralBody && bIt->phase == 0) {
+			body_type_t type = bIt->type;
+			if (type != BODY_TYPE_STAR && bIt->phase == 0) {
 				// Compute phase
-				double mu = centralBody->GetGm() + (type != TestParticle ? bIt->GetGm() : 0.0);
+				double mu = centralBody->GetGm() + (type != BODY_TYPE_TESTPARTICLE ? bIt->GetGm() : 0.0);
 				Phase phase(bIt->GetId());
 				if (Ephemeris::CalculatePhase(mu, bIt->orbitalElement, &phase) == 1) {
 					Error::_errMsg = "The phase could not be computed for body with Id: ";
@@ -155,7 +156,7 @@ int Simulation::SetPhasesRadiiDensity()
 				bIt->phase = new Phase(phase);
 			}
 
-			if (type == SuperPlanetesimal || type == TestParticle ) {
+			if (type == BODY_TYPE_SUPERPLANETESIMAL || type == BODY_TYPE_TESTPARTICLE ) {
 				continue;
 			}
 			if (bIt->characteristics->radius == 0.0 && bIt->characteristics->density == 0.0)
@@ -187,7 +188,7 @@ int Simulation::CheckBodyGroupList()
 
 	// Checks whether the BodyGroupList contains one and only one central body.
     // If zero or more than 1 are defined, an ApplicationException is thrown.
-	int nCB = this->bodyGroupList.CountBy(CentralBody);
+	int nCB = this->bodyGroupList.CountBy(BODY_TYPE_STAR);
     if (nCB > 1)
     {
 		Error::_errMsg = "There are more than 1 central body defined!";
@@ -253,7 +254,7 @@ Body* Simulation::FindBy(int id)
 Body* Simulation::FindCentralBody()
 {
 	std::list<Body *> centralBodyList;
-	bodyGroupList.FindBy(CentralBody, centralBodyList);
+	bodyGroupList.FindBy(BODY_TYPE_STAR, centralBodyList);
 	if (centralBodyList.size() == 0) {
 		return 0;
 	}

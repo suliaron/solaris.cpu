@@ -1,8 +1,7 @@
 #ifndef ACCELERATION_H_
 #define ACCELERATION_H_
 
-#include "IntegratorType.h"
-#include "FrameCenter.h"
+#include "SolarisType.h"
 
 class BodyData;
 class Nebula;
@@ -14,7 +13,7 @@ class Vector;
 
 class Acceleration {
 public:
-	Acceleration(IntegratorType iType, FrameCenter fCenter, BodyData *bD, Nebula *n);
+	Acceleration(integrator_type_t iType, frame_center_t fCenter, BodyData *bD, Nebula *n);
 	~Acceleration();
 
 	int	Compute(            double t, double *y, double *totalAccel);
@@ -57,8 +56,8 @@ public:
 	bool		evaluateTypeIIMigration;
 
 private:
-	IntegratorType	_integratorType;
-	FrameCenter			_frameCenter;
+	integrator_type_t		_integratorType;
+	frame_center_t			_frameCenter;
 };
 
 #endif

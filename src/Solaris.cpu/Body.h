@@ -6,68 +6,19 @@
 #include "Phase.h"
 #include "OrbitalElement.h"
 #include "Characteristics.h"
-#include "solaris.type\solaris.type.h"
+#include "SolarisType.h"
 
 class Phase;
 class OrbitalElement;
 class Characteristics;
-
-enum BodyType {
-	UndefinedBodyType,
-	CentralBody,
-    GiantPlanet,
-    RockyPlanet,
-    ProtoPlanet,
-    SuperPlanetesimal,
-    Planetesimal,
-    TestParticle,
-	NOfBodyType
-};
-
-enum Ln {
-	UndefinedLn,
-	L1,
-	L2,
-	L3,
-	L4,
-	L5
-};
-
-enum MigrationType {
-	No,
-	TypeI,
-	TypeII
-};
-
-enum MPCOrbitType {
-    UndefinedMPCOrbitType						= 0,
-    Aten										= 2,
-    Apollo										= 3,
-    Amor										= 4,
-    ObjectWithqLt1_665							= 5,
-    Hungaria									= 6,
-    Phocaea										= 7,
-    Hilda										= 8,
-    JupiterTrojan								= 9,
-    Centaur										= 10,
-    Plutino										= 14,
-    OtherResonantTNO							= 15,
-    Cubewano									= 16,
-    ScatteredDisk								= 17,
-    ObjectIsNEO									= 2048,
-    ObjectIs1kmOrLargerNEO						= 4096,
-    OneOppositionObjectSeenAtEarlierOpposition	= 8192,
-    CriticalListNumberedObject					= 16384,
-    ObjectIsPHA									= 32768
-};
 
 class Body {
 public:
 
 	Body();
 	Body(int id);
-	Body(BodyType type);
-	Body(BodyType type, std::string name);
+	Body(body_type_t type);
+	Body(body_type_t type, std::string name);
 
 	inline int GetId() { return _id; }
 
@@ -76,22 +27,22 @@ public:
 
 	void Print();
 
-	MPCOrbitType	mPCOrbitType;
-	std::string		mPCOrbitTypestr;
-	std::string		name;
-	std::string		designation;
-	std::string		provisionalDesignation;
-	std::string		reference;
-	std::string		opposition;
-	std::string		guid;
-	BodyType		type;
-	Ln				ln;
-	MigrationType	migrationType;
-	double			migrationStopAt;
+	mpcorbit_type_t		mPCOrbitType;
+	std::string			mPCOrbitTypestr;
+	std::string			name;
+	std::string			designation;
+	std::string			provisionalDesignation;
+	std::string			reference;
+	std::string			opposition;
+	std::string			guid;
+	body_type_t			type;
+	ln_t				ln;
+	migration_type_t	migrationType;
+	double				migrationStopAt;
 
-	Phase			*phase;
-	OrbitalElement	*orbitalElement;
-	Characteristics	*characteristics;
+	Phase				*phase;
+	OrbitalElement		*orbitalElement;
+	Characteristics		*characteristics;
 
 //private:
 	// id of the body instance

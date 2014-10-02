@@ -75,13 +75,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="constants.h" />
-    <ClInclude Include="file_util.h" />
-    <ClInclude Include="number_of_bodies.h" />
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="FileUtil.h" />
+    <ClInclude Include="NumberOfBodies.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="file_util.cpp" />
-    <ClCompile Include="generator.cpp" />
+    <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="Generator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="main2.cu" />

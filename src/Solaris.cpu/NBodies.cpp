@@ -46,25 +46,25 @@ int NBodies::Count(std::list<Body *> &list)
 	for (std::list<Body *>::iterator it = list.begin(); it != list.end(); it++) {
 		total++;
 		switch ((*it)->type) {
-			case CentralBody:
+			case BODY_TYPE_STAR:
 				centralBody++;
 				break;
-			case GiantPlanet:
+			case BODY_TYPE_GIANTPLANET:
 				giantPlanet++;
 				break;
-			case RockyPlanet:
+			case BODY_TYPE_ROCKYPLANET:
 				rockyPlanet++;
 				break;
-			case ProtoPlanet:
+			case BODY_TYPE_PROTOPLANET:
 				protoPlanet++;
 				break;
-			case SuperPlanetesimal:
+			case BODY_TYPE_SUPERPLANETESIMAL:
 				superPlanetsimal++;
 				break;
-			case Planetesimal:
+			case BODY_TYPE_PLANETESIMAL:
 				planetsimal++;
 				break;
-			case TestParticle:
+			case BODY_TYPE_TESTPARTICLE:
 				testParticle++;
 				break;
 			default:
@@ -77,28 +77,28 @@ int NBodies::Count(std::list<Body *> &list)
 	return 0;
 }
 
-int NBodies::UpdateAfterRemove(BodyType bodyType)
+int NBodies::UpdateAfterRemove(body_type_t bodyType)
 {
 	switch (bodyType) {
-		case CentralBody:
+		case BODY_TYPE_STAR:
 			centralBody--;
 			break;
-		case GiantPlanet:
+		case BODY_TYPE_GIANTPLANET:
 			giantPlanet--;
 			break;
-		case RockyPlanet:
+		case BODY_TYPE_ROCKYPLANET:
 			rockyPlanet--;
 			break;
-		case ProtoPlanet:
+		case BODY_TYPE_PROTOPLANET:
 			protoPlanet--;
 			break;
-		case SuperPlanetesimal:
+		case BODY_TYPE_SUPERPLANETESIMAL:
 			superPlanetsimal--;
 			break;
-		case Planetesimal:
+		case BODY_TYPE_PLANETESIMAL:
 			planetsimal--;
 			break;
-		case TestParticle:
+		case BODY_TYPE_TESTPARTICLE:
 			testParticle--;
 			break;
 		default:

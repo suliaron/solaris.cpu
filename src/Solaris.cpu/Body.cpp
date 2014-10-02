@@ -11,11 +11,11 @@ Body::Body()
 {
 	_id				= Body::_bodyId++;
 
-	type			= UndefinedBodyType;
-	ln				= UndefinedLn;
-	mPCOrbitType	= UndefinedMPCOrbitType;
+	type			= BODY_TYPE_UNDEFINED;
+	ln				= LN_UNDEFINED;
+	mPCOrbitType	= MPCORBIT_TYPE_UNDEFINED;
 
-	migrationType	= No;
+	migrationType	= MIGRATION_TYPE_NO;
 	migrationStopAt = 0.0;
 
 	phase			= 0;
@@ -27,11 +27,11 @@ Body::Body(int id)
 {
 	_id = id;
 
-	type = UndefinedBodyType;
-	ln = UndefinedLn;
-	mPCOrbitType = UndefinedMPCOrbitType;
+	type = BODY_TYPE_UNDEFINED;
+	ln = LN_UNDEFINED;
+	mPCOrbitType = MPCORBIT_TYPE_UNDEFINED;
 
-	migrationType = No;
+	migrationType = MIGRATION_TYPE_NO;
 	migrationStopAt = 0.0;
 
 	phase = 0;
@@ -39,15 +39,15 @@ Body::Body(int id)
 	characteristics = 0;
 }
 
-Body::Body(BodyType type)
+Body::Body(body_type_t type)
 {
 	_id = Body::_bodyId++;
 
 	this->type = type;
-	ln = UndefinedLn;
-	mPCOrbitType = UndefinedMPCOrbitType;
+	ln = LN_UNDEFINED;
+	mPCOrbitType = MPCORBIT_TYPE_UNDEFINED;
 
-	migrationType = No;
+	migrationType = MIGRATION_TYPE_NO;
 	migrationStopAt = 0.0;
 
 	phase = 0;
@@ -55,17 +55,17 @@ Body::Body(BodyType type)
 	characteristics = 0;
 }
 
-Body::Body(BodyType type, std::string name)
+Body::Body(body_type_t type, std::string name)
 {
 	_id = Body::_bodyId++;
 
 	this->name = name;
 
 	this->type = type;
-	ln = UndefinedLn;
-	mPCOrbitType = UndefinedMPCOrbitType;
+	ln = LN_UNDEFINED;
+	mPCOrbitType = MPCORBIT_TYPE_UNDEFINED;
 
-	migrationType = No;
+	migrationType = MIGRATION_TYPE_NO;
 	migrationStopAt = 0.0;
 
 	phase = 0;

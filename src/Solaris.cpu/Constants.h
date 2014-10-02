@@ -2,9 +2,7 @@
 #define CONSTANTS_H_
 
 #include <string>
-
-#define SQR(a)		((a)*(a))
-#define CUBE(a)		((a)*(a)*(a))
+#include "SolarisMacro.h"
 
 namespace Constants
 {
@@ -18,6 +16,7 @@ namespace Constants
 
 	const double Pi					      = 3.14159265358979323846;
 	const double SqrtTwoPi			      = 2.50662827463100024161;
+	const double FourPiOverThree		  = 4.1887902047863909846168578443727;
 
 	const double Boltzman_SI		      = 1.3806488e-23;			        // J/K = (kg m^2) / (s^2 K)
 	const double ProtonMass_SI		      = 1.672621777e-27;		        // kg

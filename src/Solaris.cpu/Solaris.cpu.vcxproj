@@ -29,11 +29,9 @@
     <ClInclude Include="Event.h" />
     <ClInclude Include="EventCondition.h" />
     <ClInclude Include="FargoParameters.h" />
-    <ClInclude Include="FrameCenter.h" />
     <ClInclude Include="GasComponent.h" />
     <ClInclude Include="GasDecreaseType.h" />
     <ClInclude Include="Integrator.h" />
-    <ClInclude Include="IntegratorType.h" />
     <ClInclude Include="NBodies.h" />
     <ClInclude Include="Nebula.h" />
     <ClInclude Include="OrbitalElement.h" />
@@ -56,7 +54,6 @@
     <ClInclude Include="Units.h" />
     <ClInclude Include="Validator.h" />
     <ClInclude Include="Vector.h" />
-    <ClInclude Include="XmlFileAdapter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Acceleration.cpp" />
@@ -103,7 +100,6 @@
     <ClCompile Include="Units.cpp" />
     <ClCompile Include="Validator.cpp" />
     <ClCompile Include="Vector.cpp" />
-    <ClCompile Include="XmlFileAdapter.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FA6F7693-8379-48A9-BFF7-002372F9C3B6}</ProjectGuid>
@@ -145,6 +141,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\solaris.type;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

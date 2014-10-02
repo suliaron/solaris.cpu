@@ -1,15 +1,15 @@
+#pragma once
+
 #include <vector>
+#include <string>
+
+using namespace std;
 
 typedef double		ttt_t;
 typedef double		var_t;
 typedef bool		bool_t;
 
 typedef int			int_t;
-
-struct double2
-	{
-		double x, y;
-	} double2;
 
 typedef struct var2
 	{
@@ -24,8 +24,6 @@ typedef struct vec
 		double z;
 	} vec_t;
 
-
-
 typedef struct int2
 	{
 		int x;
@@ -34,6 +32,7 @@ typedef struct int2
 
 typedef enum body_type
 	{
+		BODY_TYPE_UNDEFINED,
 		BODY_TYPE_STAR,
 		BODY_TYPE_GIANTPLANET,
 		BODY_TYPE_ROCKYPLANET,
@@ -64,13 +63,6 @@ typedef enum phys_prop_name
 		PHYS_PROP_NAME_N
 	} phys_prop_name_t;
 
-typedef enum migration_type
-	{
-		MIGRATION_TYPE_NO,
-		MIGRATION_TYPE_TYPE_I,
-		MIGRATION_TYPE_TYPE_II
-	} migration_type_t;
-
 typedef enum mpcorbit_type
 	{
 		MPCORBIT_TYPE_UNDEFINED										= 0,
@@ -94,6 +86,13 @@ typedef enum mpcorbit_type
 		MPCORBIT_TYPE_OBJECTISPHA									= 32768
 	} mpcorbit_type_t;
 
+typedef enum migration_type
+	{
+		MIGRATION_TYPE_NO,
+		MIGRATION_TYPE_TYPE_I,
+		MIGRATION_TYPE_TYPE_II
+	} migration_type_t;
+
 typedef enum ln
 	{
 		LN_UNDEFINED,
@@ -115,7 +114,8 @@ typedef enum gas_decrease_type
 	{
 		GAS_DECREASE_TYPE_CONSTANT,
 		GAS_DECREASE_TYPE_LINEAR,
-		GAS_DECREASE_TYPE_EXPONENTIAL
+		GAS_DECREASE_TYPE_EXPONENTIAL,
+		GAS_DECREASE_TYPE_N
 	} gas_decrease_type_t;
 
 typedef enum integrator_type

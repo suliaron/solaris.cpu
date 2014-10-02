@@ -7,21 +7,7 @@
 #include "BodyData.h"
 #include "Error.h"
 #include "TimeLine.h"
-
-#define HANDLE_NULL(a) \
-	if ((a) == NULL) { \
-		Error::_errMsg = "host memory allocation"; \
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
-        return 1; \
-	}
-
-#define HANDLE_RESULT(result) \
-	if (result == 1) { \
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
-		return 1; \
-	}
-
-#define CUBE(a)		((a)*(a)*(a))
+#include "SolarisMacro.h"
 
 DormandPrince::DormandPrince()
 {

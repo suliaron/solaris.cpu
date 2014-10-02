@@ -3,8 +3,7 @@
 
 #include "Constants.h"
 #include "GasComponent.h"
-
-#define SQR(a)		((a)*(a))
+#include "SolarisMacro.h"
 
 GasComponent::GasComponent()
 {

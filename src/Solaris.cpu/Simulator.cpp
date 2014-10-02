@@ -14,17 +14,16 @@
 #include "Error.h"
 #include "EventCondition.h"
 #include "Integrator.h"
-#include "IntegratorType.h"
 #include "RungeKutta4.h"
 #include "RungeKuttaFehlberg78.h"
 #include "Settings.h"
 #include "Simulation.h"
 #include "Simulator.h"
+#include "SolarisMacro.h"
+#include "SolarisType.h"
 #include "TimeLine.h"
 #include "Tools.h"
 
-#define SQR(a)		((a)*(a))
-#define CUBE(a)		((a)*(a)*(a))
 
  /**
   * Used during the decision making to decide if it is time to save the data or stop the integration
@@ -46,7 +45,7 @@ Simulator::Simulator(Simulation *simulation)
 	rungeKutta4			= 0;
 	dormandPrince		= 0;
 
-	integratorType		= RUNGE_KUTTA_FEHLBERG78;
+	integratorType		= INTEGRATOR_TYPE_RUNGE_KUTTA_FEHLBERG78;
 
 	// TODO: ask Laci
 	outputType			= BinaryFileAdapter::OutputType::BINARY;
@@ -364,7 +363,7 @@ int Simulator::PreIntegration()
 	preTimeLine.output = preTimeLine.Forward() ? _simulation->settings.timeLine->output : -_simulation->settings.timeLine->output;
 
 	preTimeLine.hDid = 0.0;
-	preTimeLine.hNext  = preTimeLine.Forward() ? ShortestPeriod() / 50.0 : -ShortestPeriod() / 50.0;
+	//preTimeLine.hNext  = preTimeLine.Forward() ? ShortestPeriod() / 50.0 : -ShortestPeriod() / 50.0;
 	if (fabs(preTimeLine.hNext) > fabs(preTimeLine.length)) {
 		preTimeLine.hNext = preTimeLine.length;
 	}
@@ -415,14 +414,14 @@ int Simulator::MainIntegration()
 int Simulator::Insert(double time, std::list<BodyGroup>::iterator &bgIt)
 {
 	std::list<Body *>::iterator bodyListIt = _simulation->bodyList.begin();
-	for (int i=0; i<NOfBodyType; i++ ) {
-		if ((BodyType)i == UndefinedBodyType) continue;
+	for (int i=0; i<BODY_TYPE_N; i++ ) {
+		if ((body_type_t)i == BODY_TYPE_UNDEFINED) continue;
 
 		std::list<Body *> bodyListByType;
-		bgIt->FindBy((BodyType)i, bodyListByType);
+		bgIt->FindBy((body_type_t)i, bodyListByType);
 		if (bodyListByType.size() > 0) {
 			_simulation->binary->SaveBodyProperties(time, bodyListByType);
-			SetIteratorAfter((BodyType)i, bodyListIt);
+			SetIteratorAfter((body_type_t)i, bodyListIt);
 			_simulation->bodyList.insert(bodyListIt, bodyListByType.begin(), bodyListByType.end());
 		}
 	}
@@ -433,14 +432,14 @@ int Simulator::Insert(double time, std::list<BodyGroup>::iterator &bgIt)
 int Simulator::Insert(double time, std::list<BodyGroup *>::iterator &bgIt)
 {
 	std::list<Body *>::iterator bodyListIt = _simulation->bodyList.begin();
-	for (int i=0; i<NOfBodyType; i++ ) {
-		if ((BodyType)i == UndefinedBodyType) continue;
+	for (int i=0; i<BODY_TYPE_N; i++ ) {
+		if ((body_type_t)i == BODY_TYPE_UNDEFINED) continue;
 
 		std::list<Body *> bodyListByType;
-		(*bgIt)->FindBy((BodyType)i, bodyListByType);
+		(*bgIt)->FindBy((body_type_t)i, bodyListByType);
 		if (bodyListByType.size() > 0) {
 			_simulation->binary->SaveBodyProperties(time, bodyListByType);
-			SetIteratorAfter((BodyType)i, bodyListIt);
+			SetIteratorAfter((body_type_t)i, bodyListIt);
 			_simulation->bodyList.insert(bodyListIt, bodyListByType.begin(), bodyListByType.end());
 		}
 	}
@@ -448,7 +447,7 @@ int Simulator::Insert(double time, std::list<BodyGroup *>::iterator &bgIt)
 	return 0;
 }
 
-int Simulator::SetIteratorAfter(BodyType type, std::list<Body *>::iterator& it)
+int Simulator::SetIteratorAfter(body_type_t type, std::list<Body *>::iterator& it)
 {
 	while (it != _simulation->bodyList.end() && (*it)->type != type) {
 		it++;
@@ -478,9 +477,9 @@ double Simulator::ShortestPeriod()
 	double centralGm = _simulation->bodyList.front()->GetGm();
 	double period = 1.0e10;
 	for (std::list<Body *>::iterator it = _simulation->bodyList.begin(); it != _simulation->bodyList.end(); it++) {
-		if ((*it)->type == CentralBody)
+		if ((*it)->type == BODY_TYPE_STAR)
 			continue;
-		double mu = centralGm + ((*it)->type == TestParticle ? 0.0 : (*it)->GetGm());
+		double mu = centralGm + ((*it)->type == BODY_TYPE_TESTPARTICLE ? 0.0 : (*it)->GetGm());
 		double p = (*it)->CalculateOrbitalPeriod(mu);
 		if (p > 0 && p < period)
 			period = p;
@@ -505,7 +504,7 @@ int Simulator::BodyListToBodyData()
 		bodyData.migStopAt[i]   = (*it)->migrationStopAt;
 		bodyData.migType[i]     = (*it)->migrationType;
 
-		if ((*it)->type != TestParticle) {
+		if ((*it)->type != BODY_TYPE_TESTPARTICLE) {
 			bodyData.mass[i]    = (*it)->characteristics->mass;
 			bodyData.radius[i]  = (*it)->characteristics->radius;
 			bodyData.density[i] = (*it)->characteristics->density;
@@ -565,7 +564,7 @@ void Simulator::UpdateBodyListAfterIntegration()
 #endif
 	int i = 0;
 	for (std::list<Body *>::iterator it = _simulation->bodyList.begin(); it != _simulation->bodyList.end(); it++ ) {
-		if ((*it)->type != TestParticle) {
+		if ((*it)->type != BODY_TYPE_TESTPARTICLE) {
 			(*it)->characteristics->mass = bodyData.mass[i];
 			(*it)->characteristics->radius = bodyData.radius[i];
 			(*it)->characteristics->density = bodyData.density[i];
@@ -713,7 +712,7 @@ int Simulator::RemoveBody(int bodyId)
 		}
 	}
 
-	if (bodyData.nBodies.UpdateAfterRemove((BodyType)(bodyData.type[index])) == 1) {
+	if (bodyData.nBodies.UpdateAfterRemove((body_type_t)(bodyData.type[index])) == 1) {
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
@@ -746,7 +745,7 @@ int Simulator::HandleCollision(int idx1, int idx2, int& survivIdx, int &mergerId
 		mergerIdx = this->bodyData.mass[idx1] < this->bodyData.mass[idx2] ? idx1 : idx2;
 	}
 
-	if (bodyData.type[mergerIdx] == TestParticle)
+	if (bodyData.type[mergerIdx] == BODY_TYPE_TESTPARTICLE)
 		return 0;
 
 	survivId = bodyData.id[survivIdx];
@@ -770,10 +769,10 @@ int Simulator::CalculatePhaseAfterCollision(int survivIdx, int mergerIdx)
 //	fprintf(stderr, "File: %40s, Function: %40s, Line: %10d\n", __FILE__, __FUNCTION__, __LINE__);
 #endif
     // TODO: revisit this after the change of the equations of motions, i.e. when the ref. frame is inertial
-	if (bodyData.type[survivIdx] != CentralBody) {
+	if (bodyData.type[survivIdx] != BODY_TYPE_STAR) {
 		double survivMass = bodyData.mass[survivIdx];
 		double mergerMass = 0.0;
-		if (bodyData.type[mergerIdx] == SuperPlanetesimal) {
+		if (bodyData.type[mergerIdx] == BODY_TYPE_SUPERPLANETESIMAL) {
 			mergerMass = Characteristics::CalculateMass(bodyData.density[mergerIdx], bodyData.radius[mergerIdx]);
 		}
 		else {
@@ -797,7 +796,7 @@ int Simulator::CalculateCharacteristicsAfterCollision(int survivId, int mergerId
 #endif
 	double mergerMass = 0.0;
 	double survivMass = bodyData.mass[survivIdx];
-	if (bodyData.type[mergerIdx] == SuperPlanetesimal) {
+	if (bodyData.type[mergerIdx] == BODY_TYPE_SUPERPLANETESIMAL) {
 		mergerMass = Characteristics::CalculateMass(bodyData.density[mergerIdx], bodyData.radius[mergerIdx]);
 	}
 	else {

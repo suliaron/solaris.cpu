@@ -12,7 +12,7 @@ public:
 	NBodies();
 
 	int Count(std::list<Body *> &list);
-	int UpdateAfterRemove(BodyType bodyType);
+	int UpdateAfterRemove(body_type_t bodyType);
 
 	int NOfMassive();
 	int NOfPlAndSpl();

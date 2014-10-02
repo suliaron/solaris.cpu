@@ -54,7 +54,7 @@ double BodyGroupList::GetStartTime(FL fl)
 
 /// Iterates over the BodyGroups of the list and calls on each item the CountBy() method to
 /// count the bodies with the specified type. The aggregated count is returned.
-int BodyGroupList::CountBy(BodyType type)
+int BodyGroupList::CountBy(body_type_t type)
 {
 	int	result = 0;
 	for (std::list<BodyGroup>::iterator it = this->items.begin(); it != this->items.end(); it++) {
@@ -76,7 +76,7 @@ void BodyGroupList::FindBy(double startTime, std::list<BodyGroup *> &result)
 
 /// Iterates over the BodyGroups of the list and calls on each item the FindBy() method to
 /// find the bodies with the specified type. The reference of each such Body is added to the result.
-void BodyGroupList::FindBy(BodyType type, std::list<Body *> &result)
+void BodyGroupList::FindBy(body_type_t type, std::list<Body *> &result)
 {
 	for (std::list<BodyGroup>::iterator it = items.begin(); it != items.end(); it++) {
 		it->FindBy(type, result);
@@ -198,7 +198,7 @@ int BodyGroupList::DistinctStartTimesOfMassiveBodies(int &count)
             // The number of massive bodies in BodyGroup
 			partial += (*bgIt)->CountBy(0.0);
             // The number of the central body must be subtracted
-            partial -= (*bgIt)->CountBy(CentralBody);
+            partial -= (*bgIt)->CountBy(BODY_TYPE_STAR);
 		}
 		list.clear();
 		count += partial > 0 ? 1 : 0;

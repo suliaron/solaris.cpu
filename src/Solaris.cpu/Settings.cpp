@@ -7,7 +7,7 @@ Settings::Settings() :
 	frame_center(FRAME_CENTER_ASTRO),
 	enableDistinctStartTimes(false),
 	integrator(0),
-	intgr_type(UNDEFINED),
+	intgr_type(INTEGRATOR_TYPE_UNDEFINED),
 	timeLine(0),
 	collision(0),
 	closeEncounter(0),
