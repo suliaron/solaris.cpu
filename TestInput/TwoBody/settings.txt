@@ -1,0 +1,22 @@
+enabledistinctstarttimes = true
+
+barycentric = bary
+
+integrator_name = rk4
+integrator_accuracy_value = -10
+
+timeline_start = 0.0
+timeline_length = 100.0
+timeline_output = 1.0
+timeline_unit = year
+
+ejection_value = 10
+ejection_unit = AU
+hitcentrum_value = 0.1
+hitcentrum_unit = AU
+closeencounter_factor = 3
+closeencounter_stop = false
+collision_factor = 1.0
+collision_stop = false
+weakcapture_factor = 4
+weakcapture_stop = false

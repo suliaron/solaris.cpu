@@ -244,11 +244,6 @@ static int SetSettings(std::string& key, std::string& value, Settings& settings,
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.c_str()))) {
-			Error::_errMsg = "Value out of range";
-			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-			return 1;
-		}
 		else if (!settings.closeEncounter) {
 			settings.closeEncounter = new EventCondition();
 		}
@@ -270,7 +265,7 @@ static int SetSettings(std::string& key, std::string& value, Settings& settings,
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		else if (!Validator::ElementOfAndContainsLower(0.0,1.0,atof(value.c_str()))) {
+		else if (!Validator::GreaterThanOrEqualTo(1.0, atof(value.c_str()))) {
 			Error::_errMsg = "Invalid value for 'factor'";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
@@ -293,11 +288,6 @@ static int SetSettings(std::string& key, std::string& value, Settings& settings,
     else if (key == "weakcapture_factor") {
 		if (!Tools::IsNumber(value)) {
 			Error::_errMsg = "Invalid number: '" + value + "'!";
-			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-			return 1;
-		}
-		else if (!Validator::GreaterThanOrEqualTo(0.0, atof(value.c_str()))) {
-			Error::_errMsg = "Value out of range";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}

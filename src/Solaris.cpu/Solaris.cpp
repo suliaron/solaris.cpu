@@ -36,21 +36,18 @@ int ProcessArgv(int argc, char* argv[], std::string &directory, std::string &fil
 			exit(0);
 		}
         else if (strcmp(argv[i], "-is") == 0) {
-            runType = "New";
 			i++;
 			std::string input(argv[i]);
 			directory = Tools::GetDirectory(input, Output::directorySeparator);
 			fileNameSettings  = Tools::GetFileName( input, Output::directorySeparator);
         }
 		else if (strcmp(argv[i], "-ib") == 0) {
-            runType = "New";
 			i++;
 			std::string input(argv[i]);
 			directory = Tools::GetDirectory(input, Output::directorySeparator);
 			fileNameBodyGroupList  = Tools::GetFileName( input, Output::directorySeparator);
         }
 		else if (strcmp(argv[i], "-in") == 0) {
-            runType = "New";
 			i++;
 			std::string input(argv[i]);
 			directory = Tools::GetDirectory(input, Output::directorySeparator);
@@ -194,7 +191,7 @@ int main(int argc, char* argv[])
 	std::string		fileNameSettings;
     std::string		fileNameBodyGroupList;
 	std::string		fileNameNebula;
-	std::string     runType;
+	std::string     runType("New");
     if (ProcessArgv(argc, argv, Output::directory, fileNameSettings, fileNameBodyGroupList, fileNameNebula, runType) == 1) {
 		Error::PrintStackTrace();
 		exit(1);
@@ -205,7 +202,10 @@ int main(int argc, char* argv[])
 	char*	inputPathBodyGroupList = 0;
 	Tools::CreatePath(Output::directory, fileNameBodyGroupList, Output::directorySeparator, &inputPathBodyGroupList);
 	char*	inputPathNebula = 0;
-	Tools::CreatePath(Output::directory, fileNameNebula, Output::directorySeparator, &inputPathNebula);
+	if (0 < fileNameNebula.length())
+	{
+		Tools::CreatePath(Output::directory, fileNameNebula, Output::directorySeparator, &inputPathNebula);
+	}
 
     Simulation  simulation(runType);
 	if (LoadInput(inputPathSettings, inputPathBodyGroupList, inputPathNebula, simulation) == 1) {
