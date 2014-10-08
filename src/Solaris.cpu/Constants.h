@@ -9,7 +9,7 @@ namespace Constants
 	const std::string CodeName		      = "Solaris";
 	const std::string Version		      = "1.0";
 
-	const std::string Usage				  = "Usage is -is <settings file> -ib <bodygrouplist file> -in <nebula file> | -c <settings file> <bodygrouplist file> <nebula file>\n";
+	const std::string Usage				  = "Usage is -id <directory> -is <settings file> -ib <bodygrouplist file> -in <nebula file> | -c <directory> <settings file> <bodygrouplist file> <nebula file>\n";
 
 	const int	 CheckForSM			      = 100;
 	const double SmallestNumber		      = 1.0e-50;

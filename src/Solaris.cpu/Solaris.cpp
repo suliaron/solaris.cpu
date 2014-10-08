@@ -35,36 +35,32 @@ int ProcessArgv(int argc, char* argv[], std::string &directory, std::string &fil
 			std::cout << Constants::CodeName << ":" << std::endl << Constants::Usage;
 			exit(0);
 		}
+		else if (strcmp(argv[i], "-id") == 0) {
+			i++;
+			directory = argv[i];
+		}
         else if (strcmp(argv[i], "-is") == 0) {
 			i++;
-			std::string input(argv[i]);
-			directory = Tools::GetDirectory(input, Output::directorySeparator);
-			fileNameSettings  = Tools::GetFileName( input, Output::directorySeparator);
+			fileNameSettings  = argv[i];
         }
 		else if (strcmp(argv[i], "-ib") == 0) {
 			i++;
-			std::string input(argv[i]);
-			directory = Tools::GetDirectory(input, Output::directorySeparator);
-			fileNameBodyGroupList  = Tools::GetFileName( input, Output::directorySeparator);
+			fileNameBodyGroupList  = argv[i];
         }
 		else if (strcmp(argv[i], "-in") == 0) {
 			i++;
-			std::string input(argv[i]);
-			directory = Tools::GetDirectory(input, Output::directorySeparator);
-			fileNameNebula  = Tools::GetFileName( input, Output::directorySeparator);
+			fileNameNebula  = argv[i];
         }
         else if (strcmp(argv[i], "-c") == 0) {
             runType = "Continue";
 			i++;
-			std::string inputSettings(argv[i]);
+			directory = argv[i];
 			i++;
-			std::string inputBodyGroupList(argv[i]);
+			fileNameSettings  = argv[i];
 			i++;
-			std::string inputNebula(argv[i]);
-			directory = Tools::GetDirectory(inputSettings, Output::directorySeparator);
-			fileNameSettings  = Tools::GetFileName( inputSettings, Output::directorySeparator);
-			fileNameBodyGroupList  = Tools::GetFileName( inputBodyGroupList, Output::directorySeparator);
-			fileNameNebula  = Tools::GetFileName( inputNebula, Output::directorySeparator);
+			fileNameBodyGroupList  = argv[i];
+			i++;
+			fileNameNebula  = argv[i];			
         }
 		else {
 			Error::_errMsg = "Invalid argument.\n" + Constants::Usage;

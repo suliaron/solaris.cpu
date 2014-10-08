@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-is C:\Work\Projects\solaris.cpu\TestInput\TwoBody\settings.txt -ib C:\Work\Projects\solaris.cpu\TestInput\TwoBody\TwoBody.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-id E:\Work\ELTE\TestInput\TwoBody -is settings.txt -ib TwoBody.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

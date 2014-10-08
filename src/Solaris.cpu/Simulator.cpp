@@ -48,7 +48,7 @@ Simulator::Simulator(Simulation *simulation)
 	integratorType		= INTEGRATOR_TYPE_RUNGE_KUTTA_FEHLBERG78;
 
 	// TODO: ask Laci
-	outputType			= BinaryFileAdapter::OutputType::BINARY;
+	outputType			= BinaryFileAdapter::OutputType::TEXT;
 }
 
 int Simulator::Continue()
@@ -363,7 +363,7 @@ int Simulator::PreIntegration()
 	preTimeLine.output = preTimeLine.Forward() ? _simulation->settings.timeLine->output : -_simulation->settings.timeLine->output;
 
 	preTimeLine.hDid = 0.0;
-	//preTimeLine.hNext  = preTimeLine.Forward() ? ShortestPeriod() / 50.0 : -ShortestPeriod() / 50.0;
+	preTimeLine.hNext  = preTimeLine.Forward() ? ShortestPeriod() / 50.0 : -ShortestPeriod() / 50.0;
 	if (fabs(preTimeLine.hNext) > fabs(preTimeLine.length)) {
 		preTimeLine.hNext = preTimeLine.length;
 	}
