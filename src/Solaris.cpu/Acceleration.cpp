@@ -530,6 +530,14 @@ int Acceleration::MigrationTypeIIAC(double t, double *y, double *accel)
 
 int Acceleration::GravityBC(double t, double *y, double *accel)
 {
+	for (int i=0; i<bodyData->nBodies.total; i++) {
+		// y: (x, y, z), (vx, vy, vz), etc.
+		int i0 = 6*i; 
+		double r2 = SQR(y[i0 + 0]) + SQR(y[i0 + 1]) + SQR(y[i0 + 2]); 
+		double r = sqrt(r2); 
+		rm3[i]= 1.0 / (r2 * r);
+	}
+
 	int result = GravityBC_SelfInteracting(t, y, accel);
 	HANDLE_RESULT(result);
 
