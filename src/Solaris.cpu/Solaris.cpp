@@ -35,7 +35,7 @@ int ProcessArgv(int argc, char* argv[], std::string &directory, std::string &fil
 			std::cout << Constants::CodeName << ":" << std::endl << Constants::Usage;
 			exit(0);
 		}
-		else if (strcmp(argv[i], "-id") == 0) {
+		else if (strcmp(argv[i], "-iDir") == 0) {
 			i++;
 			directory = argv[i];
 		}

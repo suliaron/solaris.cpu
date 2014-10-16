@@ -1,0 +1,19 @@
+name = nebula
+description = nebula
+fargopath = 345
+
+gascomponent_alpha = 0.5
+gascomponent_type = constant
+gascomponent_timescale = 100
+gascomponent_t0 = 0.5
+gascomponent_t1 = 34
+gascomponent_unit = year
+gascomponent_eta_c = 0.5
+gascomponent_eta_index = 2.3
+gascomponent_tau_c = 0.6
+gascomponent_tau_index = 1.4
+gascomponent_scaleheight_c = 6.2
+gascomponent_scaleheight_index = 3.4
+gascomponent_densityfunction_index = 2.6
+gascomponent_densityfunction_density_value = 0.6
+gascomponent_densityfunction_density_unit = solarau3

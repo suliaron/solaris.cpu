@@ -181,7 +181,7 @@ int	Simulator::DecisionMaking(TimeLine* timeLine, bool& stop)
 //		delete[] acceleration.accelMigrationTypeII;
 //	}
 
-	if (fabs(actualTime) >= fabs(timeLine->length)) {
+	if (fabs(actualTime - timeLine->start) >= fabs(timeLine->length)) {
 		UpdateBodyListAfterIntegration();
 		stop = true;
 		return 0;
@@ -194,8 +194,8 @@ int	Simulator::DecisionMaking(TimeLine* timeLine, bool& stop)
 		return 0;
 	}
 
-	if (fabs(actualTime + timeLine->hNext) > fabs(timeLine->length)) {
-		timeLine->hNext = timeLine->length - actualTime;
+	if (fabs(actualTime  - timeLine->start + timeLine->hNext) > fabs(timeLine->length)) {
+		timeLine->hNext = timeLine->length - (actualTime - timeLine->start);
 	}
 
 	if (fabs(timeLine->lastSave) >= fabs(timeLine->output)) {
@@ -360,6 +360,10 @@ int Simulator::PreIntegration()
 	TimeLine preTimeLine = *_simulation->settings.timeLine;
 
 	preTimeLine.length = preTimeLine.start - preTimeLine.time;
+	if (0.0 == preTimeLine.length)
+	{
+		return 0;
+	}
 	preTimeLine.output = preTimeLine.Forward() ? _simulation->settings.timeLine->output : -_simulation->settings.timeLine->output;
 
 	preTimeLine.hDid = 0.0;

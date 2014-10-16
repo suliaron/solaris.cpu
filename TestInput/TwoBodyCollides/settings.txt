@@ -7,7 +7,7 @@ integrator_accuracy_value = -10
 
 timeline_start = 0.0
 timeline_length = 100.0
-timeline_output = 0.25
+timeline_output = 0.01
 timeline_unit = year
 
 ejection_value = 10
