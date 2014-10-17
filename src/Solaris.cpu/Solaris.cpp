@@ -60,7 +60,9 @@ int ProcessArgv(int argc, char* argv[], std::string &directory, std::string &fil
 			i++;
 			fileNameBodyGroupList  = argv[i];
 			i++;
-			fileNameNebula  = argv[i];			
+			if (argv[i]) {
+				fileNameNebula  = argv[i];	
+			}
         }
 		else {
 			Error::_errMsg = "Invalid argument.\n" + Constants::Usage;
@@ -226,17 +228,17 @@ int main(int argc, char* argv[])
 	simulation.binary->Log("Simulation was successfully initialized.", true);
 
 	Simulator		simulator(&simulation);
-    //if (simulation.runType == "Continue" ) {
-    //    if (simulator.Continue() == 1) {
-		  //  Error::PrintStackTrace();
-		  //  exit(1);
-	   // }
-    //}
+    if (simulation.runType == "Continue" ) {
+        if (simulator.Continue() == 1) {
+		    Error::PrintStackTrace();
+		    exit(1);
+	    }
+    }
 
-	if (simulator.Run() == 1) {
-		Error::PrintStackTrace();
-		exit(1);
-	}
+	//if (simulator.Run() == 1) {
+	//	Error::PrintStackTrace();
+	//	exit(1);
+	//}
 	
 	return 0;
 }

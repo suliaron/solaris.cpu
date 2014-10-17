@@ -183,39 +183,72 @@ void BinaryFileAdapter::SavePhase(ofstream& writer, double *y, int *id, OutputTy
  * Saves the energy, the angular momentum vector and its length, the position vector of the baricenter and its length
  * and the velocity of the barycenter and its length.
  */
-void BinaryFileAdapter::SaveIntegrals(double time, int n, double *integrals)
+void BinaryFileAdapter::SaveIntegrals(double time, int n, double *integrals, OutputType type)
 {
-	static bool firstCall = true;
 
-	string path = output->GetPath(output->integrals);
-	ofstream writer(path.c_str(), ios::out | ios::app | ios::binary);
-	if (writer) {
-		if (firstCall)
+	switch(type)
+	{
+		case BINARY:
 		{
-			char header[] = "time [day], mass [Solar], bary center position r: x [AU], y [AU], z [AU], bary center velocity v: x [AU/day], y [AU/day], z [AU/day], length of r [AU], length of v [AU/day], angular momentum vector c: x, y, z, length of c, kinetic energy, potential energy, total energy";
-			int len = (int)strlen(header);
-			writer.write(reinterpret_cast<char*>(&len), sizeof(int));
-			writer.write(header, len);
-			firstCall = false;
-		}
-		int nElement = n + 1;
-		writer.write(reinterpret_cast<char*>(&nElement), sizeof(nElement));
-		writer.write(reinterpret_cast<char*>(&time), sizeof(time));
-		writer.write(reinterpret_cast<char*>(integrals), n * sizeof(*integrals));
+			static bool firstCall = true;
 
-		if (writer.bad()) {
-			_errMsg = "An error occurred during writing the integrals!";
-			Log(_errMsg, true);
-			perror(_errMsg.c_str());
+			string path = output->GetPath(output->integrals);
+			ofstream writer(path.c_str(), ios::out | ios::app | ios::binary);
+			if (writer) {
+				if (firstCall)
+				{
+					char header[] = "time [day], mass [Solar], bary center position r: x [AU], y [AU], z [AU], bary center velocity v: x [AU/day], y [AU/day], z [AU/day], length of r [AU], length of v [AU/day], angular momentum vector c: x, y, z, length of c, kinetic energy, potential energy, total energy";
+					int len = (int)strlen(header);
+					writer.write(reinterpret_cast<char*>(&len), sizeof(int));
+					writer.write(header, len);
+					firstCall = false;
+				}
+				int nElement = n + 1;
+				writer.write(reinterpret_cast<char*>(&nElement), sizeof(nElement));
+				writer.write(reinterpret_cast<char*>(&time), sizeof(time));
+				writer.write(reinterpret_cast<char*>(integrals), n * sizeof(*integrals));
+				if (writer.bad()) {
+					_errMsg = "An error occurred during writing the integrals!";
+					Log(_errMsg, true);
+					perror(_errMsg.c_str());
+					exit(1);
+				}
+			}
+			else {
+				Log("The file '" + path + "' could not opened!", true);
+				exit(1);
+			}
+			writer.close();
+		}
+
+		case TEXT:
+		{
+			string path = output->GetPath(output->GetFilenameWithoutExt(output->integrals) + ".txt");
+			ofstream writer(path.c_str(), ios::out | ios::app);
+			if (writer) {
+				writer << setw(15) << setprecision(6) << time;
+				for (int i = 0; i < 16; i++) {
+					writer << setw(15) << setprecision(6) << integrals[i];
+				}
+				writer << endl;
+				if (writer.bad()) {
+					_errMsg = "An error occurred during writing the integrals!";
+					Log(_errMsg, true);
+					perror(_errMsg.c_str());
+					exit(1);
+				}
+			}
+			else {
+				Log("The file '" + path + "' could not opened!", true);
+				exit(1);
+			}
+			writer.close();
+		}
+		default:
+			Log("Unknown OutputType.", true);
 			exit(1);
-		}
+			break;
 	}
-	else {
-		Log("The file '" + path + "' could not opened!", true);
-		exit(1);
-	}
-
-	writer.close();
 }
 
 /// <summary>
@@ -223,35 +256,63 @@ void BinaryFileAdapter::SaveIntegrals(double time, int n, double *integrals)
 /// </summary>
 /// <param name="path">The path of the output file</param>
 /// <param name="list">The data of the TwoBodyAffairs</param>
-void BinaryFileAdapter::SaveTwoBodyAffairs(list<TwoBodyAffair>& list)
+void BinaryFileAdapter::SaveTwoBodyAffairs(list<TwoBodyAffair>& list, OutputType type)
 {
-	string path = output->GetPath(output->twoBodyAffair);
-	ofstream writer(path.c_str(), ios::out | ios::app | ios::binary);
-	if (writer) {
-		for (std::list<TwoBodyAffair>::iterator it = list.begin(); it != list.end(); it++) {
-			SaveTwoBodyAffair(writer, *it);
+	switch(type)
+	{
+		case BINARY:
+		{
+			string path = output->GetPath(output->twoBodyAffair);
+			ofstream writer(path.c_str(), ios::out | ios::app | ios::binary);
+			if (writer) {
+				for (std::list<TwoBodyAffair>::iterator it = list.begin(); it != list.end(); it++) {
+					SaveTwoBodyAffair(writer, *it, type);
+				}
+				writer.close();
+			}
+			else {
+				_errMsg = "The file '" + path + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
 		}
-		writer.close();
+
+		case TEXT:
+		{
+			
+		}
+		default:
+			Log("Unknown OutputType.", true);
+			exit(1);
+			break;
 	}
-	else {
-		_errMsg = "The file '" + path + "' could not opened!";
-		Log(_errMsg, true);
-		perror(_errMsg.c_str());
-		exit(1);
-	}
+	
+	
 }
 
-void BinaryFileAdapter::SaveTwoBodyAffair(ofstream& writer, TwoBodyAffair& affair)
+void BinaryFileAdapter::SaveTwoBodyAffair(ofstream& writer, TwoBodyAffair& affair, OutputType type)
 {
-	writer.write(reinterpret_cast<char*>(&(affair.id)), sizeof(int));
-	writer.write(reinterpret_cast<char*>(&(affair.type)), sizeof(int));
+	switch(type)
+	{
+		case BINARY:
+		{
+			writer.write(reinterpret_cast<char*>(&(affair.id)), sizeof(int));
+			writer.write(reinterpret_cast<char*>(&(affair.type)), sizeof(int));
 
-	writer.write(reinterpret_cast<char*>(&(affair.body1Id)), sizeof(int));
-	writer.write(reinterpret_cast<char*>(&(affair.body2Id)), sizeof(int));
-	writer.write(reinterpret_cast<char*>(&(affair.body1Phase)), 6*sizeof(double));
-	writer.write(reinterpret_cast<char*>(&(affair.body2Phase)), 6*sizeof(double));
-	writer.write(reinterpret_cast<char*>(&(affair.time)), sizeof(double));
+			writer.write(reinterpret_cast<char*>(&(affair.body1Id)), sizeof(int));
+			writer.write(reinterpret_cast<char*>(&(affair.body2Id)), sizeof(int));
+			writer.write(reinterpret_cast<char*>(&(affair.body1Phase)), 6*sizeof(double));
+			writer.write(reinterpret_cast<char*>(&(affair.body2Phase)), 6*sizeof(double));
+			writer.write(reinterpret_cast<char*>(&(affair.time)), sizeof(double));
+		}
 
+		case TEXT:
+		{
+
+		}
+	}
+	
 	if (writer.bad()) {
 		_errMsg = "An error occurred during writing the two body affair!";
 		Log(_errMsg, true);
@@ -260,121 +321,156 @@ void BinaryFileAdapter::SaveTwoBodyAffair(ofstream& writer, TwoBodyAffair& affai
 	}
 }
 
-void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList)
+void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, OutputType type)
 {
-	string constPropPath = output->GetPath(output->constantProperties);
-	ofstream constPropWriter(constPropPath.c_str(), ios::out | ios::app | ios::binary);
-	if (!constPropWriter) {
-		_errMsg = "The file '" + constPropPath + "' could not opened!";
-		Log(_errMsg, true);
-		perror(_errMsg.c_str());
-		exit(1);
+	switch(type)
+	{
+		case BINARY:
+		{
+			string constPropPath = output->GetPath(output->constantProperties);
+			ofstream constPropWriter(constPropPath.c_str(), ios::out | ios::app | ios::binary);
+			if (!constPropWriter) {
+				_errMsg = "The file '" + constPropPath + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+
+			string varPropPath = output->GetPath(output->variableProperties);
+			ofstream varPropWriter(varPropPath.c_str(), ios::out | ios::app | ios::binary);
+			if (!varPropWriter) {
+				_errMsg = "The file '" + varPropPath + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				constPropWriter.close();
+				exit(1);
+			}
+
+			for (list<Body* >::iterator it = bodyList.begin(); it != bodyList.end(); it++) {
+				SaveConstantProperty(constPropWriter, *it, type);
+				SaveVariableProperty(varPropWriter, *it, time, type);
+			}
+			constPropWriter.close();
+			varPropWriter.close();
+		}
+		case TEXT:
+		{
+
+		}
 	}
 
-	string varPropPath = output->GetPath(output->variableProperties);
-	ofstream varPropWriter(varPropPath.c_str(), ios::out | ios::app | ios::binary);
-	if (!varPropWriter) {
-		_errMsg = "The file '" + varPropPath + "' could not opened!";
-		Log(_errMsg, true);
-		perror(_errMsg.c_str());
-		constPropWriter.close();
-		exit(1);
-	}
-
-	for (list<Body* >::iterator it = bodyList.begin(); it != bodyList.end(); it++) {
-		SaveConstantProperty(constPropWriter, *it);
-		SaveVariableProperty(varPropWriter, *it, time);
-	}
-	constPropWriter.close();
-	varPropWriter.close();
+	
 }
 
-void BinaryFileAdapter::SaveConstantProperty(Body* body)
+void BinaryFileAdapter::SaveConstantProperty(Body* body, OutputType type)
 {
-	string constPropPath = output->GetPath(output->constantProperties);
-	ofstream constPropWriter(constPropPath.c_str(), ios::out | ios::app | ios::binary);
-	if (!constPropWriter) {
-		_errMsg = "The file '" + constPropPath + "' could not opened!";
-		Log(_errMsg, true);
-		perror(_errMsg.c_str());
-		exit(1);
+	switch(type)
+	{
+		case BINARY:
+		{
+			string constPropPath = output->GetPath(output->constantProperties);
+			ofstream constPropWriter(constPropPath.c_str(), ios::out | ios::app | ios::binary);
+			if (!constPropWriter) {
+				_errMsg = "The file '" + constPropPath + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+			SaveConstantProperty(constPropWriter, body, type);
+			constPropWriter.close();
+		}
+		case TEXT:
+		{
+		
+		}
 	}
-	SaveConstantProperty(constPropWriter, body);
-	constPropWriter.close();
+
+	
 }
 
-void BinaryFileAdapter::SaveConstantProperty(ofstream& writer, Body* body)
+void BinaryFileAdapter::SaveConstantProperty(ofstream& writer, Body* body, OutputType type)
 {
-	int i = body->GetId();
-	writer.write(reinterpret_cast<char *>(&i), sizeof(i));
+	switch(type)
+	{
+		case BINARY:
+		{
+			int i = body->GetId();
+			writer.write(reinterpret_cast<char *>(&i), sizeof(i));
 
-	string s = body->guid;
-	char *guid = new char[16];
-	Tools::GuidToCharArray(s, guid);
+			string s = body->guid;
+			char *guid = new char[16];
+			Tools::GuidToCharArray(s, guid);
 
-	// NOTE: this must be done in such a way that when the C# initializes a new guid form an array of 16 bytes, the correct
-	// guid will be created. The constructor : Guid(int, short, short, byte, byte, byte, byte, byte, byte, byte, byte)
-	// This will be the int part
-	for (int j=3; j>=0; j--) writer.write(&guid[j], 1);
-	// This will be the 1. short part
-	for (int j=5; j>=4; j--) writer.write(&guid[j], 1);
-	// This will be the 2. short part
-	for (int j=7; j>=6; j--) writer.write(&guid[j], 1);
-	// This will be the last 8 bytes
-	writer.write(&guid[8], 8);
-	//writer.write(guid, 16);
+			// NOTE: this must be done in such a way that when the C# initializes a new guid form an array of 16 bytes, the correct
+			// guid will be created. The constructor : Guid(int, short, short, byte, byte, byte, byte, byte, byte, byte, byte)
+			// This will be the int part
+			for (int j=3; j>=0; j--) writer.write(&guid[j], 1);
+			// This will be the 1. short part
+			for (int j=5; j>=4; j--) writer.write(&guid[j], 1);
+			// This will be the 2. short part
+			for (int j=7; j>=6; j--) writer.write(&guid[j], 1);
+			// This will be the last 8 bytes
+			writer.write(&guid[8], 8);
+			//writer.write(guid, 16);
 
-	// NOTE: The length of the strings cannot be more than 127!
-	// See: http://stackoverflow.com/questions/1550560/encoding-an-integer-in-7-bit-format-of-c-sharp-binaryreader-readstring
-	// because I will read this file with C#, and BinaryReader.ReadString method use a 7-bit encoding for the length of the string.
-	const char *p = body->name.c_str();
-	char len = (char)strlen(p);
-	writer.write(&len, sizeof(char));
-	writer.write(p, len);
+			// NOTE: The length of the strings cannot be more than 127!
+			// See: http://stackoverflow.com/questions/1550560/encoding-an-integer-in-7-bit-format-of-c-sharp-binaryreader-readstring
+			// because I will read this file with C#, and BinaryReader.ReadString method use a 7-bit encoding for the length of the string.
+			const char *p = body->name.c_str();
+			char len = (char)strlen(p);
+			writer.write(&len, sizeof(char));
+			writer.write(p, len);
 
-	p = body->designation.c_str();
-	len = (char)strlen(p);
-	writer.write(&len, sizeof(char));
-	writer.write(p, len);
+			p = body->designation.c_str();
+			len = (char)strlen(p);
+			writer.write(&len, sizeof(char));
+			writer.write(p, len);
 
-	p = body->provisionalDesignation.c_str();
-	len = (char)strlen(p);
-	writer.write(&len, sizeof(char));
-	writer.write(p, len);
+			p = body->provisionalDesignation.c_str();
+			len = (char)strlen(p);
+			writer.write(&len, sizeof(char));
+			writer.write(p, len);
 
-	p = body->reference.c_str();
-	len = (char)strlen(p);
-	writer.write(&len, sizeof(char));
-	writer.write(p, len);
+			p = body->reference.c_str();
+			len = (char)strlen(p);
+			writer.write(&len, sizeof(char));
+			writer.write(p, len);
 
-	p = body->opposition.c_str();
-	len = (char)strlen(p);
-	writer.write(&len, sizeof(char));
-	writer.write(p, len);
+			p = body->opposition.c_str();
+			len = (char)strlen(p);
+			writer.write(&len, sizeof(char));
+			writer.write(p, len);
 
-	i = body->ln;
-	writer.write(reinterpret_cast<char *>(&i), sizeof(i));
+			i = body->ln;
+			writer.write(reinterpret_cast<char *>(&i), sizeof(i));
 
-	i = body->type;
-	writer.write(reinterpret_cast<char *>(&i), sizeof(i));
+			i = body->type;
+			writer.write(reinterpret_cast<char *>(&i), sizeof(i));
 
-	i = body->mPCOrbitType;
-	writer.write(reinterpret_cast<char *>(&i), sizeof(i));
+			i = body->mPCOrbitType;
+			writer.write(reinterpret_cast<char *>(&i), sizeof(i));
 
-	i = body->migrationType;
-	writer.write(reinterpret_cast<char *>(&i), sizeof(i));
+			i = body->migrationType;
+			writer.write(reinterpret_cast<char *>(&i), sizeof(i));
 
-	if (body->characteristics != 0) {
-		double d = body->characteristics->absVisMag;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+			if (body->characteristics != 0) {
+				double d = body->characteristics->absVisMag;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
 
-		d = body->characteristics->stokes;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-	}
-	else {
-		double d = 0.0;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+				d = body->characteristics->stokes;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+			}
+			else {
+				double d = 0.0;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+			}
+		}
+
+		case TEXT:
+		{
+		
+		}
 	}
 
 	if (writer.bad()) {
@@ -385,90 +481,124 @@ void BinaryFileAdapter::SaveConstantProperty(ofstream& writer, Body* body)
 	}
 }
 
-void BinaryFileAdapter::SaveVariableProperty(Body* body, double time)
+void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, OutputType type)
 {
-	string varPropPath = output->GetPath(output->variableProperties);
-	ofstream varPropWriter(varPropPath.c_str(), ios::out | ios::app | ios::binary);
-	if (!varPropWriter) {
-		_errMsg = "The file '" + varPropPath + "' could not opened!";
-		Log(_errMsg, true);
-		perror(_errMsg.c_str());
-		exit(1);
-	}
-	SaveVariableProperty(varPropWriter, body, time);
-	varPropWriter.close();
-}
-
-void BinaryFileAdapter::SaveVariableProperty(ofstream& writer, Body* body, double time)
-{
-	int id = _propertyId++;
-	writer.write(reinterpret_cast<char *>(&id), sizeof(id));
-
-	int bodyId = body->GetId();
-	writer.write(reinterpret_cast<char *>(&bodyId), sizeof(bodyId));
-
-	double d = time;
-	writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-
-	if (body->characteristics != 0) {
-		d = body->characteristics->mass;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-
-		d = body->characteristics->radius;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-
-		d = body->characteristics->density;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-		if (body->characteristics->componentList.size() > 0) {
-			string compPropPath = output->GetPath(output->compositionProperties);
-			ofstream compPropWriter(compPropPath.c_str(), ios::out | ios::app | ios::binary);
-			if (!compPropWriter) {
-				_errMsg = "The file '" + compPropPath + "' could not opened!";
+	switch(type)
+	{
+		case BINARY:
+		{
+			string varPropPath = output->GetPath(output->variableProperties);
+			ofstream varPropWriter(varPropPath.c_str(), ios::out | ios::app | ios::binary);
+			if (!varPropWriter) {
+				_errMsg = "The file '" + varPropPath + "' could not opened!";
 				Log(_errMsg, true);
 				perror(_errMsg.c_str());
 				exit(1);
 			}
-			SaveCompositionProperty(compPropWriter, body, id);
-			compPropWriter.close();
+			SaveVariableProperty(varPropWriter, body, time, type);
+			varPropWriter.close();
+		}
+		case TEXT:
+		{
+
 		}
 	}
-	else {
-		double d = 0.0;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-		if (writer.bad()) {
-			_errMsg = "An error occurred during writing the variable property!";
-			Log(_errMsg, true);
-			perror(_errMsg.c_str());
-			exit(1);
-		}
-	}
+	
+	
 }
 
-void BinaryFileAdapter::SaveCompositionProperty(ofstream& writer, Body* body, int propertyId)
+void BinaryFileAdapter::SaveVariableProperty(ofstream& writer, Body* body, double time, OutputType type)
 {
-	for (list<Component>::iterator it = body->characteristics->componentList.begin(); 
-		it != body->characteristics->componentList.end(); it++) {
+	switch(type)
+	{
+		case BINARY:
+		{
+			int id = _propertyId++;
+			writer.write(reinterpret_cast<char *>(&id), sizeof(id));
 
-		int id = _compositionId++;
-		writer.write(reinterpret_cast<char *>(&id), sizeof(id));
+			int bodyId = body->GetId();
+			writer.write(reinterpret_cast<char *>(&bodyId), sizeof(bodyId));
 
-		id = propertyId;
-		writer.write(reinterpret_cast<char *>(&id), sizeof(id));
+			double d = time;
+			writer.write(reinterpret_cast<char *>(&d), sizeof(d));
 
-		const char *p = it->name.c_str();
-		char len = (char)strlen(p);
-		writer.write(&len, sizeof(char));
-		writer.write(p, len);
+			if (body->characteristics != 0) {
+				d = body->characteristics->mass;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
 
-		double d = it->ratio;
-		writer.write(reinterpret_cast<char *>(&d), sizeof(d));
-		if (writer.bad()) {
-			_errMsg = "An error occurred during writing the composition property!";
-			Log(_errMsg, true);
-			perror(_errMsg.c_str());
-			exit(1);
+				d = body->characteristics->radius;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+
+				d = body->characteristics->density;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+				if (body->characteristics->componentList.size() > 0) {
+					string compPropPath = output->GetPath(output->compositionProperties);
+					ofstream compPropWriter(compPropPath.c_str(), ios::out | ios::app | ios::binary);
+					if (!compPropWriter) {
+						_errMsg = "The file '" + compPropPath + "' could not opened!";
+						Log(_errMsg, true);
+						perror(_errMsg.c_str());
+						exit(1);
+					}
+					SaveCompositionProperty(compPropWriter, body, id, type);
+					compPropWriter.close();
+				}
+			}
+			else {
+				double d = 0.0;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+				if (writer.bad()) {
+					_errMsg = "An error occurred during writing the variable property!";
+					Log(_errMsg, true);
+					perror(_errMsg.c_str());
+					exit(1);
+				}
+			}		
+		}
+		case TEXT:
+		{
+		
+		}
+	}
+	
+}
+
+void BinaryFileAdapter::SaveCompositionProperty(ofstream& writer, Body* body, int propertyId, OutputType type)
+{
+	switch(type)
+	{
+		case BINARY:
+		{
+			for (list<Component>::iterator it = body->characteristics->componentList.begin(); 
+			it != body->characteristics->componentList.end(); it++) {
+
+				int id = _compositionId++;
+				writer.write(reinterpret_cast<char *>(&id), sizeof(id));
+
+				id = propertyId;
+				writer.write(reinterpret_cast<char *>(&id), sizeof(id));
+
+				const char *p = it->name.c_str();
+				char len = (char)strlen(p);
+				writer.write(&len, sizeof(char));
+				writer.write(p, len);
+
+				double d = it->ratio;
+				writer.write(reinterpret_cast<char *>(&d), sizeof(d));
+
+				if (writer.bad()) {
+					_errMsg = "An error occurred during writing the composition property!";
+					Log(_errMsg, true);
+					perror(_errMsg.c_str());
+					exit(1);
+				}
+			}
+		}
+		case TEXT:
+		{
+		
 		}
 	}
 }
