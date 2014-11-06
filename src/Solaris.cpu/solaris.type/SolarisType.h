@@ -127,6 +127,13 @@ typedef enum integrator_type
 		INTEGRATOR_TYPE_RUNGE_KUTTA_FEHLBERG78
 	} integrator_type_t;
 
+typedef enum output_type
+	{
+		OUTPUT_TYPE_BINARY,
+		OUTPUT_TYPE_TEXT,
+		OUTPUT_TYPE_N
+	} output_type_t;
+
 typedef struct orbelem
 	{
 		var_t sma;

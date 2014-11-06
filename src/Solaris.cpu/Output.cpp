@@ -11,6 +11,8 @@ Output::Output() {
     compositionProperties	= "CompositionProperties.dat";
     twoBodyAffair			= "TwoBodyAffair.dat";
     log						= "Log.txt";
+
+	outputType = OUTPUT_TYPE_TEXT;
 }
 
 std::string Output::GetPath(const std::string fileName)

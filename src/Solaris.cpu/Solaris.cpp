@@ -147,16 +147,18 @@ int LoadInput(char* inputPathSettings, char* inputPathBodyGroupList, char* input
     		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
     }
-	/*std::string nebula;
-	if (ReadFile(inputPathNebula, nebula) == 1) {
-		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		return 1;
-	}
-	simulation.nebula = new Nebula();
-	if (ParseNebula(simulation.nebula, nebula, true) == 1) {
-    		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+	if (inputPathNebula) {
+		std::string nebula;
+		if (ReadFile(inputPathNebula, nebula) == 1) {
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
-    }*/
+		}
+		simulation.nebula = new Nebula();
+		if (ParseNebula(simulation.nebula, nebula, true) == 1) {
+    			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+				return 1;
+		}
+	}
 
 /*	if (XmlFileAdapter::DeserializeSimulation(xml.doc, simulation) == 1) {
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
@@ -211,6 +213,8 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
+	simulation.settings.output.directory = Output::directory + Output::directorySeparator + "Output";
+
     simulation.binary = new BinaryFileAdapter(&simulation.settings.output);
 	simulation.binary->LogStartParameters(argc, argv);
 	simulation.binary->Log("Simulation data was successfully loaded and deserialized.", true);
@@ -235,10 +239,10 @@ int main(int argc, char* argv[])
 	    }
     }
 
-	//if (simulator.Run() == 1) {
-	//	Error::PrintStackTrace();
-	//	exit(1);
-	//}
+	if (simulator.Run() == 1) {
+		Error::PrintStackTrace();
+		exit(1);
+	}
 	
 	return 0;
 }

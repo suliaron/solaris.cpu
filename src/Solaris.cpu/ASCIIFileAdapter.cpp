@@ -76,6 +76,19 @@ static int SetSettings(std::string& key, std::string& value, Settings& settings,
 			return 1;
 		}
     }
+	else if (key == "output_type") {
+		if (value == "binary") {
+			settings.output.outputType = OUTPUT_TYPE_BINARY;
+		}
+		else if (value == "text" || value == "ascii") {
+			settings.output.outputType = OUTPUT_TYPE_TEXT;
+		}
+		else {
+			Error::_errMsg = "Unknown output type!";
+			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			return 1;
+		}
+	}
     else if (key == "output_phases") {
 		settings.output.phases = value;
     }

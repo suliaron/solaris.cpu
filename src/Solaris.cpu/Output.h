@@ -2,6 +2,7 @@
 #define OUTPUT_H_
 
 #include <string>
+#include "SolarisType.h"
 
 class Output {
 public:
@@ -14,6 +15,7 @@ public:
 	static std::string directory;
 	static char directorySeparator;
 
+	output_type_t outputType;
 
 	std::string phases;
 	std::string integrals;

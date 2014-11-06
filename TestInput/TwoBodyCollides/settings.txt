@@ -5,6 +5,8 @@ barycentric = bary
 integrator_name = rk78
 integrator_accuracy_value = -10
 
+output_type = text
+
 timeline_start = 0.0
 timeline_length = 100.0
 timeline_output = 0.01

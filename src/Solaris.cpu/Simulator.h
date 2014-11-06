@@ -33,7 +33,6 @@ public:
 
 	BodyData					bodyData;
 	Counter						counter;
-	BinaryFileAdapter::OutputType outputType;
 
 private:
 	int 	Synchronization();

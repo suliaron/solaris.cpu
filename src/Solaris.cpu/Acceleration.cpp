@@ -15,24 +15,6 @@
 #include "Tools.h"
 #include "TwoBodyAffair.h"
 
-//#define HANDLE_NULL(a) \
-//	if ((a) == NULL) { \
-//		Error::_errMsg = "host memory allocation"; \
-//		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
-//        return 1; \
-//	}
-//
-//#define HANDLE_RESULT(result) \
-//	if (result == 1) { \
-//		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__); \
-//		return 1; \
-//	}
-//
-//#define SQR(a)		((a)*(a))
-//#define CUBE(a)		((a)*(a)*(a))
-//#define FORTH(a)	((a)*(a)*(a)*(a))
-//#define FIFTH(a)	((a)*(a)*(a)*(a)*(a))
-
 // TODO: Miért kell tudnia neki, hogy ki fogja integrálni? Elvileg neki tök mindegy!!
 Acceleration::Acceleration(integrator_type_t iType, frame_center_t fCenter, BodyData *bD, Nebula *n)
 {

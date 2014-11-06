@@ -45,10 +45,8 @@ Simulator::Simulator(Simulation *simulation)
 	rungeKutta4			= 0;
 	dormandPrince		= 0;
 
-	integratorType		= INTEGRATOR_TYPE_RUNGE_KUTTA_FEHLBERG78;
+	integratorType		= simulation->settings.intgr_type;
 
-	// TODO: ask Laci
-	outputType			= BinaryFileAdapter::OutputType::TEXT;
 }
 
 int Simulator::Continue()
@@ -105,10 +103,10 @@ int Simulator::Integrate(TimeLine* timeLine)
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
-	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, outputType);
+	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
 
 	Calculate::Integrals(&bodyData);
-	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, outputType);
+	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
 
 	bool stop = false;
 	while ( 1 ) {
@@ -135,9 +133,9 @@ int Simulator::Integrate(TimeLine* timeLine)
 			break;
 	}
 
-	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, outputType);
+	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
 	Calculate::Integrals(&bodyData);
-	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, outputType);
+	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
 
 	return 0;
 }
@@ -199,9 +197,9 @@ int	Simulator::DecisionMaking(TimeLine* timeLine, bool& stop)
 	}
 
 	if (fabs(timeLine->lastSave) >= fabs(timeLine->output)) {
-		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, outputType);
+		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
 		Calculate::Integrals(&bodyData);
-		_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, outputType);
+		_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
 		timeLine->lastSave = 0.0;
 	}
 
@@ -268,9 +266,9 @@ int	Simulator::DecisionMaking(const long int stepCounter, TimeLine* timeLine, do
 
 	if (fabs(hSum[LAST_SAVE]) >= fabs(timeLine->output)) {
 
-		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, outputType);
+		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
 		Calculate::Integrals(&bodyData);
-		_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, outputType);
+		_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
 
 		timeLine->save += timeLine->output;
 		hSum[LAST_SAVE] = 0.0;
@@ -424,7 +422,7 @@ int Simulator::Insert(double time, std::list<BodyGroup>::iterator &bgIt)
 		std::list<Body *> bodyListByType;
 		bgIt->FindBy((body_type_t)i, bodyListByType);
 		if (bodyListByType.size() > 0) {
-			_simulation->binary->SaveBodyProperties(time, bodyListByType, outputType);
+			_simulation->binary->SaveBodyProperties(time, bodyListByType, _simulation->settings.output.outputType, _simulation->binary->constpropnew, _simulation->binary->varpropnew);
 			SetIteratorAfter((body_type_t)i, bodyListIt);
 			_simulation->bodyList.insert(bodyListIt, bodyListByType.begin(), bodyListByType.end());
 		}
@@ -442,7 +440,7 @@ int Simulator::Insert(double time, std::list<BodyGroup *>::iterator &bgIt)
 		std::list<Body *> bodyListByType;
 		(*bgIt)->FindBy((body_type_t)i, bodyListByType);
 		if (bodyListByType.size() > 0) {
-			_simulation->binary->SaveBodyProperties(time, bodyListByType, outputType);
+			_simulation->binary->SaveBodyProperties(time, bodyListByType, _simulation->settings.output.outputType, _simulation->binary->constpropnew, _simulation->binary->varpropnew);
 			SetIteratorAfter((body_type_t)i, bodyListIt);
 			_simulation->bodyList.insert(bodyListIt, bodyListByType.begin(), bodyListByType.end());
 		}
@@ -615,7 +613,7 @@ int Simulator::CheckEvent(double timeOfEvent)
 	}
 
 	if (_ejectionEvent.items.size() > 0) {
-		_simulation->binary->SaveTwoBodyAffairs(_ejectionEvent.items, outputType);
+		_simulation->binary->SaveTwoBodyAffairs(_ejectionEvent.items, _simulation->settings.output.outputType, _simulation->binary->twobodyaffnew);
 		// Remove the ejected bodies from the simulation
 		for (std::list<TwoBodyAffair>::iterator it = _ejectionEvent.items.begin(); it != _ejectionEvent.items.end(); it++) {
 			std::ostringstream stream;
@@ -627,7 +625,7 @@ int Simulator::CheckEvent(double timeOfEvent)
 	}
 
 	if (_hitCentrumEvent.items.size() > 0) {
-		_simulation->binary->SaveTwoBodyAffairs(_hitCentrumEvent.items, outputType);
+		_simulation->binary->SaveTwoBodyAffairs(_hitCentrumEvent.items, _simulation->settings.output.outputType, _simulation->binary->twobodyaffnew);
 		// Remove the hit centrum bodies from the simulation
 		for (std::list<TwoBodyAffair>::iterator it = _hitCentrumEvent.items.begin(); it != _hitCentrumEvent.items.end(); it++) {
 
@@ -646,7 +644,7 @@ int Simulator::CheckEvent(double timeOfEvent)
 			body->characteristics->radius  = bodyData.radius[ survivIdx];
 			body->characteristics->density = bodyData.density[survivIdx];
 			body->characteristics->stokes  = bodyData.cD[     survivIdx];
-			_simulation->binary->SaveVariableProperty(body, it->time, outputType);
+			_simulation->binary->SaveVariableProperty(body, it->time, _simulation->settings.output.outputType, _simulation->binary->varpropnew);
 
 			std::ostringstream stream;
 			stream << *it;
@@ -683,7 +681,7 @@ int Simulator::CheckEvent(double timeOfEvent)
 				body->characteristics->radius  = bodyData.radius[ survivIdx];
 				body->characteristics->density = bodyData.density[survivIdx];
                 body->characteristics->stokes  = bodyData.cD[     survivIdx];
-				_simulation->binary->SaveVariableProperty(body, time, outputType);
+				_simulation->binary->SaveVariableProperty(body, time, _simulation->settings.output.outputType, _simulation->binary->varpropnew);
 
 				std::ostringstream stream;
 				stream << "Collision: At " << time*Constants::DayToYear << " [yr] between body with id: " << survivId << " and id: " << mergerId;
@@ -697,7 +695,7 @@ int Simulator::CheckEvent(double timeOfEvent)
 				bodyData.indexOfNN[mergerIdx] = -1;
 			}
 		}
-		_simulation->binary->SaveTwoBodyAffairs(collisions, outputType);
+		_simulation->binary->SaveTwoBodyAffairs(collisions, _simulation->settings.output.outputType, _simulation->binary->twobodyaffnew);
 	}
 
 	return 0;
