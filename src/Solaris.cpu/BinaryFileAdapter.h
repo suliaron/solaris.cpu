@@ -20,8 +20,8 @@ public:
 	void	LogStartParameters(int argc, char* argv[]);
 	void	LogTimeSpan(std::string msg, time_t startTime);
 
-	void	SavePhases(double time, int n, double *y, int *id, output_type_t type, bool& phasenew);
-	void	SavePhase(std::ofstream& writer, double *y, int *id, output_type_t type);
+	void	SavePhases(double time, int n, double *y, int *id, output_type_t type, bool& phasenew, int removed);
+	void	SavePhase(std::ofstream& writer, double *y, int *id, output_type_t type, int removed);
 
 	void	SaveIntegrals(double time, int n, double *integrals, output_type_t type, bool& integralnew);
 

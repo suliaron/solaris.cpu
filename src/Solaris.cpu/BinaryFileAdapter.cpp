@@ -104,7 +104,7 @@ void BinaryFileAdapter::LogTimeSpan(string msg, time_t t0)
 /// </summary>
 /// <param name="path">The path of the output file</param>
 /// <param name="list">The list of the bodies whose phases will be saved</param>
-void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, output_type_t type, bool& phasenew)
+void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, output_type_t type, bool& phasenew, int removed)
 {
 	switch (type) 
 	{
@@ -123,7 +123,7 @@ void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, outpu
 				writer.write(reinterpret_cast<char*>(&time), sizeof(time));
 				writer.write(reinterpret_cast<char*>(&n),    sizeof(n));
 				for (register int i=0; i<n; i++) {
-					SavePhase(writer, &(y[6*i]), &(id[i]), type);
+					SavePhase(writer, &(y[6*i]), &(id[i]), type, removed);
 				}
 				writer.flush();
 				writer.close();
@@ -148,8 +148,13 @@ void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, outpu
 			if (writer) {
 				writer << setw(15) << setprecision(10) << time;
 				writer << setw(8) << n;
-				for (register int i=0; i<n; i++) {
-					SavePhase(writer, &(y[6*i]), &(id[i]), type);
+				for (register int i=0; i < n; i++) {
+					SavePhase(writer, &(y[6*i]), &(id[i]), type, 0);
+				}
+				if (removed > 0) {
+					for (register int i=0; i < removed; i++) {
+						SavePhase(writer, &(y[6*i]), &(id[i]), type, removed);
+					}				
 				}
 				writer << endl;
 				writer.flush();
@@ -170,7 +175,7 @@ void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, outpu
     //cout << "At " << setw(10) << time * Constants::DayToYear << " [yr] phases were saved" << endl;
 }
 
-void BinaryFileAdapter::SavePhase(ofstream& writer, double *y, int *id, output_type_t type)
+void BinaryFileAdapter::SavePhase(ofstream& writer, double *y, int *id, output_type_t type, int removed)
 {
 	switch(type)
 	{
@@ -179,6 +184,13 @@ void BinaryFileAdapter::SavePhase(ofstream& writer, double *y, int *id, output_t
 		writer.write(reinterpret_cast<char*>(y),  6*sizeof(*y));
 		break;
 	case OUTPUT_TYPE_TEXT:
+		if (removed > 0) {
+			writer << setw(8) << -1;
+			for (int i = 0; i < 6; i++) {
+				writer << setw(15) << 0;
+			}
+			break;
+		}
 		writer << setw(8) << *id;
 		for (int i = 0; i < 6; i++) {
 			writer << setw(15) << setprecision(6) << y[i];
@@ -381,6 +393,7 @@ void BinaryFileAdapter::SaveTwoBodyAffair(ofstream& writer, TwoBodyAffair& affai
 				writer << setw(15) << setprecision(6) << affair.body2Phase[i];
 			}
 			writer << setw(15) << setprecision(6) << affair.time;
+			writer << endl;
 			break;
 		}
 	}

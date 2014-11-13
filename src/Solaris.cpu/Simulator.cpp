@@ -103,7 +103,7 @@ int Simulator::Integrate(TimeLine* timeLine)
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
-	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
+	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew, bodyData.nBodies.removed);
 
 	Calculate::Integrals(&bodyData);
 	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
@@ -133,7 +133,7 @@ int Simulator::Integrate(TimeLine* timeLine)
 			break;
 	}
 
-	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
+	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew, bodyData.nBodies.removed);
 	Calculate::Integrals(&bodyData);
 	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
 
@@ -197,7 +197,7 @@ int	Simulator::DecisionMaking(TimeLine* timeLine, bool& stop)
 	}
 
 	if (fabs(timeLine->lastSave) >= fabs(timeLine->output)) {
-		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
+		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew, bodyData.nBodies.removed);
 		Calculate::Integrals(&bodyData);
 		_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
 		timeLine->lastSave = 0.0;
@@ -266,7 +266,7 @@ int	Simulator::DecisionMaking(const long int stepCounter, TimeLine* timeLine, do
 
 	if (fabs(hSum[LAST_SAVE]) >= fabs(timeLine->output)) {
 
-		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew);
+		_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, _simulation->binary->phasenew, bodyData.nBodies.removed);
 		Calculate::Integrals(&bodyData);
 		_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType, _simulation->binary->integralnew);
 

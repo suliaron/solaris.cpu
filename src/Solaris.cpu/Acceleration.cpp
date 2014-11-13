@@ -589,10 +589,12 @@ int Acceleration::GravityBC_NonSelfInteracting(double t, double *y, double *acce
 		bodyData->distanceOfNN[i] = 0.0;
 		accel[i0 + 0] = y[i0 + 3]; 
 		accel[i0 + 1] = y[i0 + 4]; 
-		accel[i0 + 2] = y[i0 + 5]; 
+		accel[i0 + 2] = y[i0 + 5];
+		memset(&accel[i0 + 3], 0, 3*sizeof(double));
+
 		// The bodies are sorted with increasing mass, therefore to
 		// increase the accuracy the lightest ones are added first
-		for (register int j = nMassive - 1; j >= 0; j--) {
+		for (register int j = bodyData->nBodies.total - 1; j >= 0; j--) {
 		//for (register int j = 0; j < nMassive; j++) {
 			if (j == i)
 				continue;

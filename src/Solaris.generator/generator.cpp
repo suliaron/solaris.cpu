@@ -152,6 +152,9 @@ void print_body_record(ofstream &output, string name, param_t *param, vec_t *r, 
 	output << setw(10) <<  param->ref << sep << setw(10) <<  param->opp << sep << setw(1) <<  param->ln << sep << setw(10) << setprecision(precision) << r->x << sep << setw(10) << r->y << sep << setw(10) << r->z << sep;
 	output << setw(10) << v->x << sep << setw(10) << v->y << sep << setw(10) << v->z << sep << setw(6) << param->absvismag << sep << setw(10) << param->cd << sep << setw(10) << param->mass << sep;
 	output << setw(10) << param->radius << sep << setw(10) << param->density << sep << setw(3) << param->compnum;
+	/*output << endl;
+	output << setw(15) << setprecision(precision) << r->x << setw(15) << r->y << setw(15) << r->z << setw(15) << v->x << setw(15) << v->y << setw(15) << v->z << setw(15) << param->radius << setw(15) << param->density;
+*/
 	//if(param->compnum > 0){
 	//	param->name = new string[param->compnum];
 	//	param->ratio = new var_t[param->compnum];
@@ -160,6 +163,13 @@ void print_body_record(ofstream &output, string name, param_t *param, vec_t *r, 
 	//		//TODO
 	//	}
 	//}
+
+}
+
+void print_body_record(ofstream &output, string name, orbelem_t *oe, int precision)
+{
+	output << endl;
+	output << setw(15) << setprecision(precision) << oe->ecc << setw(15) << oe->inc << setw(15) << oe->mean << setw(15) << oe->node << setw(15) << oe->peri << setw(15) << oe->sma;
 
 }
 
@@ -268,7 +278,7 @@ int generate_pp_disk(string &path, body_disk_t& body_disk)
 {
 	static const int precision = 4;
 
-	ofstream	output(path, ios_base::app);
+	ofstream	output(path, ios_base::out);
 	if (output)
 	{
 		vec_t	rVec = {0.0, 0.0, 0.0};
@@ -317,6 +327,7 @@ int generate_pp_disk(string &path, body_disk_t& body_disk)
 					}
 
 					print_body_record(output, body_disk.names[bodyId], &param, &rVec, &vVec, precision);
+
 				}
 			}
 		}
@@ -461,11 +472,11 @@ int main(int argc, const char **argv)
 	set_default(test_disk);
 
 	test_disk.nBody[BODY_TYPE_STAR] = 1;
-	test_disk.nBody[BODY_TYPE_GIANTPLANET] = 2;
+	test_disk.nBody[BODY_TYPE_GIANTPLANET] = 0;
 	test_disk.nBody[BODY_TYPE_ROCKYPLANET] = 0;
 	test_disk.nBody[BODY_TYPE_PROTOPLANET] = 0;
 	test_disk.nBody[BODY_TYPE_SUPERPLANETESIMAL] = 0;
-	test_disk.nBody[BODY_TYPE_PLANETESIMAL] = 0;
+	test_disk.nBody[BODY_TYPE_PLANETESIMAL] = 500;
 	test_disk.nBody[BODY_TYPE_TESTPARTICLE] = 0;
 
 	int_t nBodies = calculate_number_of_bodies(test_disk);
@@ -482,48 +493,31 @@ int main(int argc, const char **argv)
 	test_disk.stop_at[index_of_body] = 0.0;
 
 	index_of_body++;
-	for (int i = 0; i < test_disk.nBody[BODY_TYPE_GIANTPLANET]; i++, index_of_body++)
+	for (int i = 0; i < test_disk.nBody[BODY_TYPE_PLANETESIMAL]; i++, index_of_body++)
 	{
 		convert << i;			// insert the textual representation of 'i' in the characters in the stream
 		i_str = convert.str();  // set 'i_str' to the contents of the stream
-		name = body_type_names[BODY_TYPE_GIANTPLANET] + i_str;		
+		name = body_type_names[BODY_TYPE_PLANETESIMAL] + i_str;		
 		test_disk.names.push_back(name);
 		convert.str("");
 
-		if (i == 0){
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_SMA], 1.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_ECC], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_INC], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_PERI], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_NODE], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_MEAN], 0.0, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_SMA], 1.0, 1.000001, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_ECC], 0.0, 0.01, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_INC], 0.0, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_PERI], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_NODE], 0.0, pdf_const);
+		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
 
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_MASS], 1.0 * Constants::JupiterToSolar, pdf_const);
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_DENSITY], 0.7 * Constants::GramPerCm3ToSolarPerAu3, pdf_const);
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
+		set(test_disk.pp_d[BODY_TYPE_PLANETESIMAL].item[PHYS_PROP_NAME_RADIUS], 100 * Constants::KilometerToAu, 1000 * Constants::KilometerToAu, pdf_const);
+		set(test_disk.pp_d[BODY_TYPE_PLANETESIMAL].item[PHYS_PROP_NAME_DENSITY], 2.0 * Constants::GramPerCm3ToSolarPerAu3, pdf_const);
+		set(test_disk.pp_d[BODY_TYPE_PLANETESIMAL].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
 		test_disk.mig_type[index_of_body] = MIGRATION_TYPE_NO;
 		test_disk.stop_at[index_of_body] = 0.0;
-		}
-
-		if (i == 1){
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_SMA], 1.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_ECC], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_INC], 180.0 * Constants::DegreeToRadian, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_PERI], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_NODE], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_GIANTPLANET].item[ORBELEM_NAME_MEAN], 0.0, pdf_const);
-
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_MASS], 1.0 * Constants::JupiterToSolar, pdf_const);
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_DENSITY], 0.7 * Constants::GramPerCm3ToSolarPerAu3, pdf_const);
-		set(test_disk.pp_d[BODY_TYPE_GIANTPLANET].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
-		test_disk.mig_type[index_of_body] = MIGRATION_TYPE_NO;
-		test_disk.stop_at[index_of_body] = 0.0;
-		}
 
 	}
 
-	outDir = "E:\\Work\\ELTE\\TestInput\\Test1"; //"C:\\Work\\Projects\\solaris.cpu\\TestInput\\TwoBody";
-	generate_pp_disk(combine_path(outDir, "test1.txt"), test_disk);
+	outDir = "E:\\Work\\ELTE\\TestInput\\Test2"; //"C:\\Work\\Projects\\solaris.cpu\\TestInput\\TwoBody";
+	generate_pp_disk(combine_path(outDir, "test2_2.txt"), test_disk);
 
 	delete[] test_disk.mig_type;
 	delete[] test_disk.stop_at;

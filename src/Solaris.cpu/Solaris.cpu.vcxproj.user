@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-iDir E:\Work\ELTE\TestInput\Test1 -is settings.txt -ib test1.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-iDir E:\Work\ELTE\TestInput\Test2 -is settings.txt -ib test2_2.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

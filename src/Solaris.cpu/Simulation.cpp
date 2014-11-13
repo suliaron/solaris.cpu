@@ -164,7 +164,10 @@ int Simulation::SetPhasesRadiiDensity()
 			if (bIt->characteristics->radius == 0.0) {
 				bIt->characteristics->radius = bIt->characteristics->CalculateRadius();
 			}
-			else {
+			else if (bIt->characteristics->mass == 0.0) {
+				bIt->characteristics->mass = bIt->characteristics->CalculateMass();
+			}
+			else if (bIt->characteristics->density == 0.0) {
 				bIt->characteristics->density = bIt->characteristics->CalculateDensity();
 			}
 		}
