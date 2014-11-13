@@ -185,14 +185,16 @@ void BinaryFileAdapter::SavePhase(ofstream& writer, double *y, int *id, output_t
 		break;
 	case OUTPUT_TYPE_TEXT:
 		if (removed > 0) {
-			writer << setw(8) << -1;
-			for (int i = 0; i < 6; i++) {
+			writer << setw(8) << -(*id);
+			for (int i = 0; i < 6; i++)
+			{
 				writer << setw(15) << 0;
 			}
 			break;
 		}
 		writer << setw(8) << *id;
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 6; i++)
+		{
 			writer << setw(15) << setprecision(6) << y[i];
 		}
 		break;

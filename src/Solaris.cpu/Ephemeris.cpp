@@ -40,7 +40,7 @@ int Ephemeris::CalculateOrbitalElement(const double mu, const Phase *phase, doub
     return 0;
 }
 
-int Ephemeris::CalculateOrbitalElement(const double mu, const Phase *phase, OrbitalElement *orbitalElement)
+int Ephemeris::CalculateOrbitalElement(double mu, const Phase *phase, OrbitalElement *orbitalElement)
 {
     const double sq2 = 1.0e-14;
     const double sq3 = 1.0e-14;

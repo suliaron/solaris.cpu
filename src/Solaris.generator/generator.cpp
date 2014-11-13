@@ -474,9 +474,9 @@ int main(int argc, const char **argv)
 	test_disk.nBody[BODY_TYPE_STAR] = 1;
 	test_disk.nBody[BODY_TYPE_GIANTPLANET] = 0;
 	test_disk.nBody[BODY_TYPE_ROCKYPLANET] = 0;
-	test_disk.nBody[BODY_TYPE_PROTOPLANET] = 0;
+	test_disk.nBody[BODY_TYPE_PROTOPLANET] = 500;
 	test_disk.nBody[BODY_TYPE_SUPERPLANETESIMAL] = 0;
-	test_disk.nBody[BODY_TYPE_PLANETESIMAL] = 500;
+	test_disk.nBody[BODY_TYPE_PLANETESIMAL] = 0;
 	test_disk.nBody[BODY_TYPE_TESTPARTICLE] = 0;
 
 	int_t nBodies = calculate_number_of_bodies(test_disk);
@@ -492,8 +492,10 @@ int main(int argc, const char **argv)
 	test_disk.mig_type[index_of_body] = MIGRATION_TYPE_NO;
 	test_disk.stop_at[index_of_body] = 0.0;
 
+	body_type_t type = BODY_TYPE_PROTOPLANET;
+
 	index_of_body++;
-	for (int i = 0; i < test_disk.nBody[BODY_TYPE_PLANETESIMAL]; i++, index_of_body++)
+	for (int i = 0; i < test_disk.nBody[type]; i++, index_of_body++)
 	{
 		convert << i;			// insert the textual representation of 'i' in the characters in the stream
 		i_str = convert.str();  // set 'i_str' to the contents of the stream
@@ -501,16 +503,16 @@ int main(int argc, const char **argv)
 		test_disk.names.push_back(name);
 		convert.str("");
 
-		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_SMA], 1.0, 1.000001, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_ECC], 0.0, 0.01, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_INC], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_PERI], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_NODE], 0.0, pdf_const);
-		set(test_disk.oe_d[BODY_TYPE_PLANETESIMAL].item[ORBELEM_NAME_MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(test_disk.oe_d[type].item[ORBELEM_NAME_SMA], 1.0, 1.1, pdf_const);
+		set(test_disk.oe_d[type].item[ORBELEM_NAME_ECC], 0.0, 0.01, pdf_const);
+		set(test_disk.oe_d[type].item[ORBELEM_NAME_INC], 0.0, pdf_const);
+		set(test_disk.oe_d[type].item[ORBELEM_NAME_PERI], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
+		set(test_disk.oe_d[type].item[ORBELEM_NAME_NODE], 0.0, pdf_const);
+		set(test_disk.oe_d[type].item[ORBELEM_NAME_MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
 
-		set(test_disk.pp_d[BODY_TYPE_PLANETESIMAL].item[PHYS_PROP_NAME_RADIUS], 100 * Constants::KilometerToAu, 1000 * Constants::KilometerToAu, pdf_const);
-		set(test_disk.pp_d[BODY_TYPE_PLANETESIMAL].item[PHYS_PROP_NAME_DENSITY], 2.0 * Constants::GramPerCm3ToSolarPerAu3, pdf_const);
-		set(test_disk.pp_d[BODY_TYPE_PLANETESIMAL].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
+		set(test_disk.pp_d[type].item[PHYS_PROP_NAME_RADIUS], 100 * Constants::KilometerToAu, 1000 * Constants::KilometerToAu, pdf_const);
+		set(test_disk.pp_d[type].item[PHYS_PROP_NAME_DENSITY], 2.0 * Constants::GramPerCm3ToSolarPerAu3, pdf_const);
+		set(test_disk.pp_d[type].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
 		test_disk.mig_type[index_of_body] = MIGRATION_TYPE_NO;
 		test_disk.stop_at[index_of_body] = 0.0;
 

@@ -657,9 +657,11 @@ int Simulator::CheckEvent(double timeOfEvent)
 	if (_simulation->settings.collision != 0) {
 		std::list<TwoBodyAffair> collisions;
 		double factor = _simulation->settings.collision->factor;
-		for (register int i=0; i < bodyData.nBodies.total; i++) {
+		for (register int i=0; i < bodyData.nBodies.total; i++)
+		{
 			int j = bodyData.indexOfNN[i];
-			if (j >= 0 && factor*(bodyData.radius[i] + bodyData.radius[j]) > bodyData.distanceOfNN[i]) {
+			if (j >= 0 && factor*(bodyData.radius[i] + bodyData.radius[j]) > bodyData.distanceOfNN[i]) 
+			{
 
 				int survivIdx = -1;
 				int mergerIdx = -1;
