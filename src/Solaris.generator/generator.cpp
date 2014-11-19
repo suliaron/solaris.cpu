@@ -499,7 +499,7 @@ int main(int argc, const char **argv)
 	{
 		convert << i;			// insert the textual representation of 'i' in the characters in the stream
 		i_str = convert.str();  // set 'i_str' to the contents of the stream
-		name = body_type_names[BODY_TYPE_PLANETESIMAL] + i_str;		
+		name = body_type_names[type] + i_str;		
 		test_disk.names.push_back(name);
 		convert.str("");
 

@@ -594,7 +594,7 @@ int Acceleration::GravityBC_NonSelfInteracting(double t, double *y, double *acce
 
 		// The bodies are sorted with increasing mass, therefore to
 		// increase the accuracy the lightest ones are added first
-		for (register int j = bodyData->nBodies.total - 1; j >= 0; j--) {
+		for (register int j = nMassive - 1; j >= 0; j--) {
 		//for (register int j = 0; j < nMassive; j++) {
 			if (j == i)
 				continue;

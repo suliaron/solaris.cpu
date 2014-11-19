@@ -165,19 +165,19 @@ int BodyData::Allocate()
 		return 1;
 	}
 	yscale		= new double[nVar];
-	if (y == 0) {
+	if (yscale == 0) {
 		Error::_errMsg = "host memory allocation";
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
 	accel		= new double[nVar];
-	if (y == 0) {
+	if (accel == 0) {
 		Error::_errMsg = "host memory allocation";
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
 	error		= new double[nVar];
-	if (y == 0) {
+	if (error == 0) {
 		Error::_errMsg = "host memory allocation";
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;

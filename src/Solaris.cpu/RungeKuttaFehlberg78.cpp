@@ -11,10 +11,13 @@
 
 #include "RungeKuttaFehlberg78.h"
 #include "Acceleration.h"
+#include "BinaryFileAdapter.h"
 #include "BodyData.h"
 #include "Error.h"
+#include "Output.h"
 #include "TimeLine.h"
 #include "SolarisMacro.h"
+#include "StopWatch.h"
 
 RungeKuttaFehlberg78::RungeKuttaFehlberg78()
 {
@@ -61,8 +64,12 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 	acceleration->evaluateTypeIMigration	= true;
 	acceleration->evaluateTypeIIMigration	= true;
 
+	StopWatch *stimer = new StopWatch[13];
+
 	// Calculate the acceleration in the initial point
+	stimer[0].start();
 	acceleration->Compute(timeLine->time, bodyData->y0, bodyData->accel);
+	stimer[0].stop();
 
 	// NOTE: Kikapcsolom a GasDrag erők kiszámítását, gyorsítva ezzel az integrálást.
 	// Készíteni összehasonlításokat, és értékelni az eredményeket, abbol a szempontbol, hogy így mennyire pontos az integralas.
@@ -76,12 +83,28 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 			bodyData->yscale[i] = fabs(bodyData->y0[i]) + fabs(bodyData->h * bodyData->accel[i]) + TINY;
 		}
 
-		if (Step(bodyData, acceleration) == 1) {
+		StopWatch timer;
+		timer.start();
+		//if (Step(bodyData, acceleration) == 1) {
+		//	Error::_errMsg = "An error occurred during Runge-Kutta-Fehlberg7(8) step!";
+		//	Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		//	result = 1;
+		//	break;
+		//}
+		if (Step(bodyData, acceleration, stimer) == 1) {
 			Error::_errMsg = "An error occurred during Runge-Kutta-Fehlberg7(8) step!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			result = 1;
 			break;
 		}
+		timer.stop();
+		Output output;
+		BinaryFileAdapter binary(&output);
+		binary.SaveElapsedTimes(timeLine->time, timer, output.outputType);
+		binary.SaveElapsedTimes(timeLine->time, stimer, output.outputType);
+
+
+
 		errorMax = GetErrorMax(nVar, bodyData->error, bodyData->yscale);
 		if (errorMax < 1.0) {
 			timeLine->hDid = bodyData->h;
@@ -109,7 +132,8 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 		// Update the phases of the system
 		std::swap(bodyData->y0, bodyData->y);
 	}
-
+	
+	delete[] stimer;
 	//delete[] accel;
 	//delete[] yscale;
 	//delete[] yerr;
@@ -222,6 +246,151 @@ int RungeKuttaFehlberg78::Step(BodyData *bodyData, Acceleration *acceleration)
 	}
 
 	acceleration->Compute(t, yTemp, fk[12]);
+	// The result of the step
+	for (int i=0; i<nVar; i++) {
+		bodyData->y[i] = bodyData->y0[i] + h*(D1_0*fk[0][i] + D1_5*fk[5][i] + D1_6*(fk[6][i] + fk[7][i]) +
+							D1_8*(fk[8][i] + fk[9][i]) + D1_10*fk[10][i]);
+	}
+
+	// Error estimation
+	double s = 41.0/840.0 * fabs(h);
+	for (int i=0; i<nVar; i++) {
+		bodyData->error[i] = s * fabs(fk[0][i] + fk[10][i] - fk[11][i] - fk[12][i]);
+	}
+
+	// i=0 changed to i=1
+	for (int i=1; i<13; i++) {
+		delete[] fk[i];
+	}
+	delete[] yTemp;
+
+	return 0;
+}
+
+int RungeKuttaFehlberg78::Step(BodyData *bodyData, Acceleration *acceleration, StopWatch *stimer)
+{
+	// These arrays will contain the accelerations computed along the trajectory of the current step
+	double	*fk[13] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	// Contains the approximation of the solution
+	double	*yTemp = 0;
+	int		nVar = bodyData->nBodies.NOfVar();
+
+	// i=0 changed to i=1
+	for (int i=1; i<13; i++) {
+		fk[i] = new double[nVar];
+		HANDLE_NULL(fk[i]);
+	}
+	yTemp = new double[nVar];
+	HANDLE_NULL(yTemp);
+
+	// Copy the initial acceleration into fk[0]
+	// NOTE: this copy can be avoided if a is used instead of fk[0], than we do not need to allocate/free fk[0]
+	//memcpy(fk[0], accel, nVar*sizeof(double));
+	fk[0] = bodyData->accel;
+	double	h = bodyData->h;
+	double	t = bodyData->time;
+//1. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_1_0*fk[0][i]);
+	}
+
+	stimer[1].start();
+	acceleration->Compute(t, yTemp, fk[1]);
+	stimer[1].stop();
+//2. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_2_0*fk[0][i] + D_2_1*fk[1][i]);
+	}
+
+	stimer[2].start();
+	acceleration->Compute(t, yTemp, fk[2]);
+	stimer[2].stop();
+//3. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_3_0*fk[0][i] + D_3_2*fk[2][i]);
+	}
+
+	stimer[3].start();
+	acceleration->Compute(t, yTemp, fk[3]);
+	stimer[3].stop();
+//4. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_4_0*fk[0][i] + D_4_2*fk[2][i] + D_4_3*fk[3][i]);
+	}
+
+	stimer[4].start();
+	acceleration->Compute(t, yTemp, fk[4]);
+	stimer[4].stop();
+//5. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_5_0*fk[0][i] + D_5_3*fk[3][i] + D_5_4*fk[4][i]);
+	}
+
+	stimer[5].start();
+	acceleration->Compute(t, yTemp, fk[5]);
+	stimer[5].stop();
+//6. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_6_0*fk[0][i] + D_6_3*fk[3][i] + D_6_4*fk[4][i] + D_6_5*fk[5][i]);
+	}
+
+	stimer[6].start();
+	acceleration->Compute(t, yTemp, fk[6]);
+	stimer[6].stop();
+//7. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_7_0*fk[0][i] + D_7_4*fk[4][i] + D_7_5*fk[5][i] + D_7_6*fk[6][i]);
+	}
+
+	stimer[7].start();
+	acceleration->Compute(t, yTemp, fk[7]);
+	stimer[7].stop();
+//8. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_8_0*fk[0][i] + D_8_3*fk[3][i] + D_8_4*fk[4][i] +
+						  D_8_5*fk[5][i] + D_8_6*fk[6][i] + D_8_7*fk[7][i]);
+	}
+
+	stimer[8].start();
+	acceleration->Compute(t, yTemp, fk[8]);
+	stimer[8].stop();
+//9. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_9_0*fk[0][i] + D_9_3*fk[3][i] + D_9_4*fk[4][i] +
+						  D_9_5*fk[5][i] + D_9_6*fk[6][i] + D_9_7*fk[7][i] + D_9_8*fk[8][i]);
+	}
+
+	stimer[9].start();
+	acceleration->Compute(t, yTemp, fk[9]);
+	stimer[9].stop();
+//10. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_10_0*fk[0][i] + D_10_3*fk[3][i] + D_10_4*fk[4][i] + D_10_5*fk[5][i] +
+						  D_10_6*fk[6][i] + D_10_7*fk[7][i] + D_10_8*fk[8][i] + D_10_9*fk[9][i]);
+	}
+
+	stimer[10].start();
+	acceleration->Compute(t, yTemp, fk[10]);
+	stimer[10].stop();
+//11. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_11_0*fk[0][i] + D_11_5*fk[5][i] + D_11_6*fk[6][i] +
+						  D_11_7*fk[7][i] + D_11_8*fk[8][i] + D_11_9*fk[9][i]);
+	}
+
+	stimer[11].start();
+	acceleration->Compute(t, yTemp, fk[11]);
+	stimer[11].stop();
+//12. substep
+	for (int i=0; i<nVar; i++) {
+		yTemp[i] = bodyData->y0[i] + h*(D_12_0*fk[0][i] + D_12_3*fk[3][i] + D_12_4*fk[4][i] + D_12_5*fk[5][i] +
+						  D_12_6*fk[6][i] + D_12_7*fk[7][i] + D_12_8*fk[8][i] + D_12_9*fk[9][i] +
+						  D_12_11*fk[11][i]);
+	}
+
+	stimer[12].start();
+	acceleration->Compute(t, yTemp, fk[12]);
+	stimer[12].stop();
 	// The result of the step
 	for (int i=0; i<nVar; i++) {
 		bodyData->y[i] = bodyData->y0[i] + h*(D1_0*fk[0][i] + D1_5*fk[5][i] + D1_6*(fk[6][i] + fk[7][i]) +

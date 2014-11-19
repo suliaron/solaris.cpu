@@ -11,6 +11,7 @@
 #include <string>
 
 #include "Integrator.h"
+#include "StopWatch.h"
 
 class Acceleration;
 class BodyData;
@@ -24,6 +25,7 @@ public:
 
 	int			Driver(BodyData *bodyData, Acceleration *acceleration, TimeLine *timeLine);
 	//int 		Step(  BodyData *bodyData, Acceleration *acceleration, double *accel, double t, double h, double *yout, double *yerr);
+	int 		Step(  BodyData *bodyData, Acceleration *acceleration, StopWatch *stimer);
 	int 		Step(  BodyData *bodyData, Acceleration *acceleration);
 	double		GetErrorMax(const int n, const double *yerr, const double *yscale);
 

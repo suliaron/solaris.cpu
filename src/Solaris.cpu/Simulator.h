@@ -34,6 +34,8 @@ public:
 	BodyData					bodyData;
 	Counter						counter;
 
+	bool detectcollision;
+
 private:
 	int 	Synchronization();
 	int		PreIntegration();

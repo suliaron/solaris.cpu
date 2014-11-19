@@ -53,6 +53,7 @@
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Simulator.h" />
     <ClInclude Include="SolidsComponent.h" />
+    <ClInclude Include="StopWatch.h" />
     <ClInclude Include="TimeLine.h" />
     <ClInclude Include="tinystr.h" />
     <ClInclude Include="tinyxml.h" />
@@ -97,6 +98,7 @@
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="Solaris.cpp" />
     <ClCompile Include="SolidsComponent.cpp" />
+    <ClCompile Include="StopWatch.cpp" />
     <ClCompile Include="TimeLine.cpp" />
     <ClCompile Include="tinystr.cpp" />
     <ClCompile Include="tinyxml.cpp" />

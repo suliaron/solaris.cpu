@@ -11,6 +11,7 @@
 #include "Simulation.h"
 #include "Simulator.h"
 #include "Settings.h"
+#include "StopWatch.h"
 #include "TimeLine.h"
 #include "Tools.h"
 
@@ -134,7 +135,7 @@ int LoadInput(char* inputPathSettings, char* inputPathBodyGroupList, char* input
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
-	if (ParseSettings(simulation.settings, settings, true) == 1) {
+	if (ParseSettings(simulation.settings, settings, false) == 1) {
     		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
     }
@@ -143,7 +144,7 @@ int LoadInput(char* inputPathSettings, char* inputPathBodyGroupList, char* input
 		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 		return 1;
 	}
-	if (ParseBodyGroupList(simulation.bodyGroupList, bodyGroupList, true) == 1) {
+	if (ParseBodyGroupList(simulation.bodyGroupList, bodyGroupList, false) == 1) {
     		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
     }
@@ -154,7 +155,7 @@ int LoadInput(char* inputPathSettings, char* inputPathBodyGroupList, char* input
 			return 1;
 		}
 		simulation.nebula = new Nebula();
-		if (ParseNebula(simulation.nebula, nebula, true) == 1) {
+		if (ParseNebula(simulation.nebula, nebula, false) == 1) {
     			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 				return 1;
 		}
@@ -213,7 +214,7 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-	simulation.settings.output.directory = Output::directory + Output::directorySeparator + "Output";
+	simulation.settings.output.directory = Output::directory + Output::directorySeparator + "Output_3";
 
     simulation.binary = new BinaryFileAdapter(&simulation.settings.output);
 	simulation.binary->LogStartParameters(argc, argv);

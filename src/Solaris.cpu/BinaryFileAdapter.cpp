@@ -2,8 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <cstdint>
 #include <cstdio>
 #include <list>
+#include <sstream>
 #include <string>
 #include <string.h>
 #include <time.h>
@@ -11,7 +13,10 @@
 
 #include "BinaryFileAdapter.h"
 #include "Body.h"
+#include "BodyData.h"
 #include "BodyGroup.h"
+#include "Counter.h"
+#include "Ephemeris.h"
 #include "Output.h"
 #include "Phase.h"
 #include "Tools.h"
@@ -104,7 +109,7 @@ void BinaryFileAdapter::LogTimeSpan(string msg, time_t t0)
 /// </summary>
 /// <param name="path">The path of the output file</param>
 /// <param name="list">The list of the bodies whose phases will be saved</param>
-void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, output_type_t type, bool& phasenew, int removed)
+void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, output_type_t type, int removed)
 {
 	switch (type) 
 	{
@@ -112,9 +117,12 @@ void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, outpu
 		{
 			string path = output->GetPath(output->phases);
 			ofstream writer;
-			if (phasenew) {
+
+			static bool firstcall = true;
+
+			if (firstcall) {
 				writer.open(path.c_str(), ios::out | ios::binary);
-				phasenew = false;
+				firstcall = false;
 			}
 			else {
 				writer.open(path.c_str(), ios::out | ios::app | ios::binary);
@@ -138,9 +146,11 @@ void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, outpu
 		{
 			string path = output->GetPath(output->GetFilenameWithoutExt(output->phases) + ".txt");
 			ofstream writer;
-			if (phasenew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				writer.open(path.c_str(), ios::out);
-				phasenew = false;
+				firstcall = false;
 			}
 			else {
 				writer.open(path.c_str(), ios::out | ios::app);
@@ -211,32 +221,32 @@ void BinaryFileAdapter::SavePhase(ofstream& writer, double *y, int *id, output_t
  * Saves the energy, the angular momentum vector and its length, the position vector of the baricenter and its length
  * and the velocity of the barycenter and its length.
  */
-void BinaryFileAdapter::SaveIntegrals(double time, int n, double *integrals, output_type_t type, bool& integralnew)
+void BinaryFileAdapter::SaveIntegrals(double time, int n, double *integrals, output_type_t type)
 {
 
 	switch(type)
 	{
 		case OUTPUT_TYPE_BINARY:
 		{
-			static bool firstCall = true;
+			static bool firstcall = true;
 
 			string path = output->GetPath(output->integrals);
 			ofstream writer;
-			if (integralnew) {
+			if (firstcall) {
 				writer.open(path.c_str(), ios::out | ios::binary);
-				integralnew = false;
+				firstcall = false;
 			}
 			else {
 				writer.open(path.c_str(), ios::out | ios::app | ios::binary);
 			}
 			if (writer) {
-				if (firstCall)
+				if (firstcall)
 				{
 					char header[] = "time [day], mass [Solar], bary center position r: x [AU], y [AU], z [AU], bary center velocity v: x [AU/day], y [AU/day], z [AU/day], length of r [AU], length of v [AU/day], angular momentum vector c: x, y, z, length of c, kinetic energy, potential energy, total energy";
 					int len = (int)strlen(header);
 					writer.write(reinterpret_cast<char*>(&len), sizeof(int));
 					writer.write(header, len);
-					firstCall = false;
+					firstcall = false;
 				}
 				int nElement = n + 1;
 				writer.write(reinterpret_cast<char*>(&nElement), sizeof(nElement));
@@ -261,9 +271,11 @@ void BinaryFileAdapter::SaveIntegrals(double time, int n, double *integrals, out
 		{
 			string path = output->GetPath(output->GetFilenameWithoutExt(output->integrals) + ".txt");
 			ofstream writer;
-			if (integralnew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				writer.open(path.c_str(), ios::out);
-				integralnew = false;
+				firstcall = false;
 			}
 			else {
 				writer.open(path.c_str(), ios::out | ios::app);
@@ -300,7 +312,7 @@ void BinaryFileAdapter::SaveIntegrals(double time, int n, double *integrals, out
 /// </summary>
 /// <param name="path">The path of the output file</param>
 /// <param name="list">The data of the TwoBodyAffairs</param>
-void BinaryFileAdapter::SaveTwoBodyAffairs(list<TwoBodyAffair>& list, output_type_t type, bool& twobodyaffnew)
+void BinaryFileAdapter::SaveTwoBodyAffairs(list<TwoBodyAffair>& list, output_type_t type)
 {
 	switch(type)
 	{
@@ -308,9 +320,11 @@ void BinaryFileAdapter::SaveTwoBodyAffairs(list<TwoBodyAffair>& list, output_typ
 		{
 			string path = output->GetPath(output->twoBodyAffair);
 			ofstream writer;
-			if (twobodyaffnew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				writer.open(path.c_str(), ios::out | ios::binary);
-				twobodyaffnew = false;
+				firstcall = false;
 			}
 			else {
 				writer.open(path.c_str(), ios::out | ios::app | ios::binary);
@@ -334,9 +348,11 @@ void BinaryFileAdapter::SaveTwoBodyAffairs(list<TwoBodyAffair>& list, output_typ
 		{
 			string path = output->GetPath(output->GetFilenameWithoutExt(output->twoBodyAffair) + ".txt");
 			ofstream writer;
-			if (twobodyaffnew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				writer.open(path.c_str(), ios::out);
-				twobodyaffnew = false;
+				firstcall = false;
 			}
 			else {
 				writer.open(path.c_str(), ios::out | ios::app);
@@ -388,13 +404,13 @@ void BinaryFileAdapter::SaveTwoBodyAffair(ofstream& writer, TwoBodyAffair& affai
 			writer << setw(5) << affair.type;
 			writer << setw(5) << affair.body1Id;
 			writer << setw(5) << affair.body2Id;
+			writer << setw(15) << setprecision(6) << affair.time;
 			for (int i = 0; i < 6; i++) {
 				writer << setw(15) << setprecision(6) << affair.body1Phase[i];
 			}
 			for (int i = 0; i < 6; i++) {
 				writer << setw(15) << setprecision(6) << affair.body2Phase[i];
 			}
-			writer << setw(15) << setprecision(6) << affair.time;
 			writer << endl;
 			break;
 		}
@@ -408,7 +424,7 @@ void BinaryFileAdapter::SaveTwoBodyAffair(ofstream& writer, TwoBodyAffair& affai
 	}
 }
 
-void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, output_type_t type, bool& constpropnew, bool& varpropnew)
+void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, output_type_t type)
 {
 	switch(type)
 	{
@@ -416,9 +432,11 @@ void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, 
 		{
 			string constPropPath = output->GetPath(output->constantProperties);
 			ofstream constPropWriter;
-			if (constpropnew) {
+			static bool firstcallC = true;
+
+			if (firstcallC) {
 				constPropWriter.open(constPropPath.c_str(), ios::out | ios::binary);
-				constpropnew = false;
+				firstcallC = false;
 			}
 			else {
 				constPropWriter.open(constPropPath.c_str(), ios::out | ios::app | ios::binary);
@@ -432,9 +450,11 @@ void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, 
 
 			string varPropPath = output->GetPath(output->variableProperties);
 			ofstream varPropWriter;
-			if (varpropnew) {
+			static bool firstcallV = true;
+
+			if (firstcallV) {
 				varPropWriter.open(varPropPath.c_str(), ios::out | ios::binary);
-				varpropnew = false;
+				firstcallV = false;
 			}
 			else {
 				varPropWriter.open(varPropPath.c_str(), ios::out | ios::app | ios::binary);
@@ -450,7 +470,7 @@ void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, 
 
 			for (list<Body* >::iterator it = bodyList.begin(); it != bodyList.end(); it++) {
 				SaveConstantProperty(constPropWriter, *it, type);
-				SaveVariableProperty(varPropWriter, *it, time, type, varpropnew);
+				SaveVariableProperty(varPropWriter, *it, time, type);
 			}
 			constPropWriter.close();
 			varPropWriter.close();
@@ -460,9 +480,11 @@ void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, 
 		{
 			string constPropPath = output->GetPath(output->GetFilenameWithoutExt(output->constantProperties) + ".txt");
 			ofstream constPropWriter;
-			if (constpropnew) {
+			static bool firstcallC = true;
+
+			if (firstcallC) {
 				constPropWriter.open(constPropPath.c_str(), ios::out);
-				constpropnew = false;
+				firstcallC = false;
 			}
 			else {
 				constPropWriter.open(constPropPath.c_str(), ios::out | ios::app);
@@ -476,9 +498,11 @@ void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, 
 
 			string varPropPath = output->GetPath(output->GetFilenameWithoutExt(output->variableProperties) + ".txt");
 			ofstream varPropWriter;
-			if (varpropnew) {
+			static bool firstcallV = true;
+
+			if (firstcallV) {
 				varPropWriter.open(varPropPath.c_str(), ios::out);
-				varpropnew = false;
+				firstcallV = false;
 			}
 			else {
 				varPropWriter.open(varPropPath.c_str(), ios::out | ios::app | ios::binary);
@@ -493,7 +517,7 @@ void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, 
 
 			for (list<Body* >::iterator it = bodyList.begin(); it != bodyList.end(); it++) {
 				SaveConstantProperty(constPropWriter, *it, type);
-				SaveVariableProperty(varPropWriter, *it, time, type, varpropnew);
+				SaveVariableProperty(varPropWriter, *it, time, type);
 			}
 			constPropWriter.close();
 			varPropWriter.close();
@@ -504,7 +528,7 @@ void BinaryFileAdapter::SaveBodyProperties(double time, list<Body* >& bodyList, 
 	
 }
 
-void BinaryFileAdapter::SaveConstantProperty(Body* body, output_type_t type, bool& constpropnew)
+void BinaryFileAdapter::SaveConstantProperty(Body* body, output_type_t type)
 {
 	switch(type)
 	{
@@ -512,9 +536,11 @@ void BinaryFileAdapter::SaveConstantProperty(Body* body, output_type_t type, boo
 		{
 			string constPropPath = output->GetPath(output->constantProperties);
 			ofstream constPropWriter;
-			if (constpropnew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				constPropWriter.open(constPropPath.c_str(), ios::out | ios::binary);
-				constpropnew = false;
+				firstcall = false;
 			}
 			else {
 				constPropWriter.open(constPropPath.c_str(), ios::out | ios::app | ios::binary);
@@ -533,9 +559,11 @@ void BinaryFileAdapter::SaveConstantProperty(Body* body, output_type_t type, boo
 		{
 			string constPropPath = output->GetPath(output->GetFilenameWithoutExt(output->constantProperties) + ".txt");
 			ofstream constPropWriter;
-			if (constpropnew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				constPropWriter.open(constPropPath.c_str(), ios::out);
-				constpropnew = false;
+				firstcall = false;
 			}
 			else {
 				constPropWriter.open(constPropPath.c_str(), ios::out | ios::app);
@@ -668,7 +696,7 @@ void BinaryFileAdapter::SaveConstantProperty(ofstream& writer, Body* body, outpu
 	}
 }
 
-void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, output_type_t type, bool& varpropnew)
+void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, output_type_t type)
 {
 	switch(type)
 	{
@@ -676,9 +704,11 @@ void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, output_typ
 		{
 			string varPropPath = output->GetPath(output->variableProperties);
 			ofstream varPropWriter;
-			if (varpropnew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				varPropWriter.open(varPropPath.c_str(), ios::out | ios::binary);
-				varpropnew = false;
+				firstcall = false;
 			}
 			else {
 				varPropWriter.open(varPropPath.c_str(), ios::out | ios::app | ios::binary);
@@ -689,7 +719,7 @@ void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, output_typ
 				perror(_errMsg.c_str());
 				exit(1);
 			}
-			SaveVariableProperty(varPropWriter, body, time, type, varpropnew);
+			SaveVariableProperty(varPropWriter, body, time, type);
 			varPropWriter.close();
 			break;
 		}
@@ -697,9 +727,11 @@ void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, output_typ
 		{
 			string varPropPath = output->GetPath(output->GetFilenameWithoutExt(output->variableProperties) + ".txt");
 			ofstream varPropWriter;
-			if (varpropnew) {
+			static bool firstcall = true;
+
+			if (firstcall) {
 				varPropWriter.open(varPropPath.c_str(), ios::out);
-				varpropnew = false;
+				firstcall = false;
 			}
 			else {
 				varPropWriter.open(varPropPath.c_str(), ios::out | ios::app);
@@ -710,7 +742,7 @@ void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, output_typ
 				perror(_errMsg.c_str());
 				exit(1);
 			}
-			SaveVariableProperty(varPropWriter, body, time, type, varpropnew);
+			SaveVariableProperty(varPropWriter, body, time, type);
 			varPropWriter.close();
 			break;
 		}
@@ -719,7 +751,7 @@ void BinaryFileAdapter::SaveVariableProperty(Body* body, double time, output_typ
 	
 }
 
-void BinaryFileAdapter::SaveVariableProperty(ofstream& writer, Body* body, double time, output_type_t type, bool& comppropnew)
+void BinaryFileAdapter::SaveVariableProperty(ofstream& writer, Body* body, double time, output_type_t type)
 {
 	switch(type)
 	{
@@ -746,9 +778,11 @@ void BinaryFileAdapter::SaveVariableProperty(ofstream& writer, Body* body, doubl
 				if (body->characteristics->componentList.size() > 0) {
 					string compPropPath = output->GetPath(output->compositionProperties);
 					ofstream compPropWriter;
-					if (comppropnew) {
+					static bool firstcall = true;
+
+					if (firstcall) {
 						compPropWriter.open(compPropPath.c_str(), ios::out | ios::binary);
-						comppropnew = false;
+						firstcall = false;
 					}
 					else {
 						compPropWriter.open(compPropPath.c_str(), ios::out | ios::app | ios::binary);
@@ -791,9 +825,11 @@ void BinaryFileAdapter::SaveVariableProperty(ofstream& writer, Body* body, doubl
 				if (body->characteristics->componentList.size() > 0) {
 					string compPropPath = output->GetPath(output->GetFilenameWithoutExt(output->compositionProperties) + ".txt");
 					ofstream compPropWriter;
-					if (comppropnew) {
+					static bool firstcall = true;
+
+					if (firstcall) {
 						compPropWriter.open(compPropPath.c_str(), ios::out);
-						comppropnew = false;
+						firstcall = false;
 					}
 					else {
 						compPropWriter.open(compPropPath.c_str(), ios::out | ios::app);
@@ -875,6 +911,292 @@ void BinaryFileAdapter::SaveCompositionProperty(ofstream& writer, Body* body, in
 					perror(_errMsg.c_str());
 					exit(1);
 				}
+			}
+			break;
+		}
+	}
+}
+
+void BinaryFileAdapter::SaveCollisionProperty(BodyData* bodyData, output_type_t type, int i, int j)
+{
+	switch(type)
+	{
+		case OUTPUT_TYPE_BINARY:
+		{
+			//TODO: implement
+			break;
+		}
+
+		case OUTPUT_TYPE_TEXT:
+		{
+
+			//std::stringstream filename;
+			//filename << "CollisionProperties" << i << '_' << j << ".txt";
+			//string path = output->GetPath(filename.str());
+			Phase phase1, phase2, phase12;
+			OrbitalElement oe1, oe2, oe12;
+
+			double *y1AC = new double[6];
+			double *y2AC = new double[6];
+			double *y12AC = new double[6];
+
+			for (int k = 0; k < 6 ; k++) {
+				y1AC[k] = bodyData->y0[6*i+k] - bodyData->y0[k];
+				y2AC[k] = bodyData->y0[6*j+k] - bodyData->y0[k];
+
+				y12AC[k] = bodyData->y0[6*i+k] - bodyData->y0[6*j+k];
+			}
+			Tools::ToPhase(y1AC, &phase1);
+			Tools::ToPhase(y2AC, &phase2);
+			double mu1 = Constants::Gauss2*(bodyData->mass[0] + bodyData->mass[i]);
+			double mu2 = Constants::Gauss2*(bodyData->mass[0] + bodyData->mass[j]);
+			Ephemeris::CalculateOrbitalElement(mu1,&phase1,&oe1);
+			Ephemeris::CalculateOrbitalElement(mu2,&phase2,&oe2);
+
+			Tools::ToPhase(y12AC, &phase12);
+			double mu12 = Constants::Gauss2*(bodyData->mass[j] + bodyData->mass[i]);
+			if (Ephemeris::CalculateOrbitalElement(mu12,&phase12,&oe12) == 0) {
+				string pathtemp = output->GetPath("valami.txt");
+				ofstream writertemp;
+				writertemp.open(pathtemp.c_str(), ios::out | ios::app);
+				writertemp << "valami" << endl;
+			}
+
+			delete[] y1AC;
+			delete[] y2AC;
+			delete[] y12AC;
+
+			string path = output->GetPath("CollisionProperties.txt");
+			ofstream writer;
+			static bool firstcall = true;
+
+			if (firstcall) {
+				writer.open(path.c_str(), ios::out);
+				//writer << setw(20) << "time [day]" << setw(20) << "stepsize [day]" << setw(20) << "id1" << setw(20) << "id2" << setw(20) << "idxofnn1" << setw(20) << "idxofnn2";
+				//writer << setw(20) << "distofnn1 [AU]" << setw(20) << "distofnn2 [AU]" << setw(20) << "mass1 [Solar]" << setw(20) << "mass2 [Solar]";
+				//writer << setw(20) << "radius1 [km]" << setw(20) << "radius2 [km]" << setw(20) << "dens1 [Solar/AU^3]" << setw(20) << "dens2 [Solar/AU^3]";
+				//writer << setw(20) << "x01 [AU]" << setw(20) << "y01 [AU]" << setw(20) << "z01 [AU]" << setw(20) << "vx01 [AU/day]" << setw(20) << "vy01 [AU/day]" << setw(20) << "vz01 [AU/day]";
+				//writer << setw(20) << "x02 [AU]" << setw(20) << "y02 [AU]" << setw(20) << "z02 [AU]" << setw(20) << "vx02 [AU/day]" << setw(20) << "vy02 [AU/day]" << setw(20) << "vz02 [AU/day]";
+				////writer << setw(20) << "x1 [AU]" << setw(20) << "y1 [AU]" << setw(20) << "z1 [AU]" << setw(20) << "vx1 [AU/day]" << setw(20) << "vy1 [AU/day]" << setw(20) << "vz1 [AU/day]";
+				////writer << setw(20) << "x2 [AU]" << setw(20) << "y2 [AU]" << setw(20) << "z2 [AU]" << setw(20) << "vx2 [AU/day]" << setw(20) << "vy2 [AU/day]" << setw(20) << "vz2 [AU/day]";
+				//writer << setw(20) << "ax1 [AU/day^2]" << setw(20) << "ay1 [AU/day^2]" << setw(20) << "az1 [AU/day^2]" << setw(20) << "ax2 [AU/day^2]" << setw(20) << "ay2 [AU/day^2]" << setw(20) << "az2 [AU/day^2]";
+				//writer << setw(20) << "errx1 [AU]" << setw(20) << "erry1 [AU]" << setw(20) << "errz1 [AU]" << setw(20) << "errvx1 [AU/day]" << setw(20) << "errvy1 [AU/day]" << setw(20) << "errvz1 [AU/day]";
+				//writer << setw(20) << "errx2 [AU]" << setw(20) << "erry2 [AU]" << setw(20) << "errz2 [AU]" << setw(20) << "errvx2 [AU/day]" << setw(20) << "errvy2 [AU/day]" << setw(20) << "errvz2 [AU/day]";
+				//writer << setw(20) << "mass [Solar]" << setw(20) << "bcx [AU]" << setw(20) << "bcy [AU]" << setw(20) << "bcz [AU]";
+				//writer << setw(20) << "bcvx [AU/day]" << setw(20) << "bcvy [AU/day]" << setw(20) << "bcvz [AU/day]" << setw(20) << "bcr [AU]" << setw(20) << "bcv [AU/day]";
+				//writer << setw(20) << "cx []" << setw(20) << "cy []" << setw(20) << "cz []" << setw(20) << "c []" << setw(20) << "kinen []" << setw(20) << "poten []" << setw(20) << "toten []";
+				//writer << endl;
+
+				firstcall = false;
+			}
+			else {
+				writer.open(path.c_str(), ios::out | ios::app);
+			}
+
+			if (!writer) {
+				_errMsg = "The file '" + path + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+			
+			
+			writer << setw(20) << setprecision(10) << bodyData->time;
+			writer << setw(20) << setprecision(10) << bodyData->h;
+			writer << setw(20) << bodyData->id[i];
+			writer << setw(20) << bodyData->id[j];
+			//writer << setw(20) << bodyData->indexOfNN[i];
+			//writer << setw(20) << bodyData->indexOfNN[j];
+			writer << setw(20) << setprecision(10) << bodyData->distanceOfNN[i];
+			//writer << setw(20) << setprecision(10) << bodyData->distanceOfNN[j];
+			writer << setw(20) << setprecision(10) << bodyData->mass[i];
+			writer << setw(20) << setprecision(10) << bodyData->mass[j];
+			writer << setw(20) << setprecision(10) << bodyData->radius[i];
+			writer << setw(20) << setprecision(10) << bodyData->radius[j];
+			writer << setw(20) << setprecision(10) << bodyData->density[i];
+			writer << setw(20) << setprecision(10) << bodyData->density[i];
+			for (int k = 0; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->y0[6*i+k];
+			}
+			writer << setw(20) << setprecision(10) << oe1.semiMajorAxis;
+			writer << setw(20) << setprecision(10) << oe1.eccentricity;
+			writer << setw(20) << setprecision(10) << oe1.inclination;
+			writer << setw(20) << setprecision(10) << oe1.argumentOfPericenter;
+			writer << setw(20) << setprecision(10) << oe1.longitudeOfNode;
+			writer << setw(20) << setprecision(10) << oe1.meanAnomaly;
+			for (int k = 0; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->y0[6*j+k];
+			}
+			writer << setw(20) << setprecision(10) << oe2.semiMajorAxis;
+			writer << setw(20) << setprecision(10) << oe2.eccentricity;
+			writer << setw(20) << setprecision(10) << oe2.inclination;
+			writer << setw(20) << setprecision(10) << oe2.argumentOfPericenter;
+			writer << setw(20) << setprecision(10) << oe2.longitudeOfNode;
+			writer << setw(20) << setprecision(10) << oe2.meanAnomaly;
+			/*for (int k = 0; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->y[6*i+k];
+			}
+			for (int k = 0; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->y[6*j+k];
+			}*/
+			for (int k = 3; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->accel[6*i+k];
+			}
+			for (int k = 3; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->accel[6*j+k];
+			}
+			for (int k = 0; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->error[6*i+k];
+			}
+			for (int k = 0; k < 6; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->error[6*j+k];
+			}
+			for (int k = 0; k < 16; k++) {
+				writer << setw(20) << setprecision(10) << bodyData->integrals[k];
+			}
+			writer << endl;
+
+			if (writer.bad()) {
+				_errMsg = "An error occurred during writing the collision properties!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+
+			writer.close();
+
+			break;
+		}
+	}
+}
+
+void BinaryFileAdapter::SaveElapsedTimes(double time, Counter counter, StopWatch timer1, StopWatch timer2, output_type_t type) {
+	switch(type)
+	{
+		case OUTPUT_TYPE_BINARY:
+		{
+			break;
+		}
+		case OUTPUT_TYPE_TEXT:
+		{
+			string path = output->GetPath("ElapsedTimeIntSim.txt");
+			ofstream writer;
+			static bool firstcall = true;
+
+			if (firstcall) {
+				writer.open(path.c_str(), ios::out);
+				firstcall = false;
+			}
+			else {
+				writer.open(path.c_str(), ios::out | ios::app);
+			}
+
+			if (!writer) {
+				_errMsg = "The file '" + path + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+
+			writer << setw(15) << counter.succededStep;
+			writer << setw(15) << time;
+			writer << setw(15) << timer1.getElapsedTime();
+			writer << setw(15) << timer2.getElapsedTime();
+			writer << endl;
+								
+			if (writer.bad()) {
+				_errMsg = "An error occurred during writing the composition property!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+			break;
+		}
+	}
+}
+
+void BinaryFileAdapter::SaveElapsedTimes(double time, StopWatch timer, output_type_t type) {
+	switch(type)
+	{
+		case OUTPUT_TYPE_BINARY:
+		{
+			break;
+		}
+		case OUTPUT_TYPE_TEXT:
+		{
+			string path = output->GetPath("ElapsedTimeStep.txt");
+			ofstream writer;
+			static bool firstcall = true;
+
+			if (firstcall) {
+				writer.open(path.c_str(), ios::out);
+				firstcall = false;
+			}
+			else {
+				writer.open(path.c_str(), ios::out | ios::app);
+			}
+
+			if (!writer) {
+				_errMsg = "The file '" + path + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+
+			writer << setw(15) << time;
+			writer << setw(15) << timer.getElapsedTime();
+			writer << endl;
+								
+			if (writer.bad()) {
+				_errMsg = "An error occurred during writing the composition property!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+			break;
+		}
+	}
+}
+
+void BinaryFileAdapter::SaveElapsedTimes(double time, StopWatch *timer, output_type_t type) {
+	switch(type)
+	{
+		case OUTPUT_TYPE_BINARY:
+		{
+			break;
+		}
+		case OUTPUT_TYPE_TEXT:
+		{
+			string path = output->GetPath("ElapsedTimeForce.txt");
+			ofstream writer;
+			static bool firstcall = true;
+
+			if (firstcall) {
+				writer.open(path.c_str(), ios::out);
+				firstcall = false;
+			}
+			else {
+				writer.open(path.c_str(), ios::out | ios::app);
+			}
+
+			if (!writer) {
+				_errMsg = "The file '" + path + "' could not opened!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
+			}
+
+			writer << setw(15) << time;
+			for (int i = 0; i < 13; i++) {
+				writer << setw(15) << timer[i].getElapsedTime();
+			}
+			writer << endl;
+								
+			if (writer.bad()) {
+				_errMsg = "An error occurred during writing the composition property!";
+				Log(_errMsg, true);
+				perror(_errMsg.c_str());
+				exit(1);
 			}
 			break;
 		}
