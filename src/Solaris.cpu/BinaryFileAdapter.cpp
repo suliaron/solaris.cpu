@@ -144,9 +144,14 @@ void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, outpu
 		}
 	case OUTPUT_TYPE_TEXT:
 		{
-			string path = output->GetPath(output->GetFilenameWithoutExt(output->phases) + ".txt");
-			ofstream writer;
 			static bool firstcall = true;
+			static int number = 1;
+			stringstream ss;
+			ss << number;
+			string str = ss.str();
+			string path = output->GetPath(output->GetFilenameWithoutExt(output->phases) + '_' + str + ".txt");
+
+			ofstream writer;
 
 			if (firstcall) {
 				writer.open(path.c_str(), ios::out);
@@ -174,6 +179,11 @@ void BinaryFileAdapter::SavePhases(double time, int n, double *y, int *id, outpu
 				Log("The file '" + path + "' could not opened!", true);
 				exit(1);
 			}
+			if (!firstcall && Tools::GetFileSize(path) >= 209715200) {
+				number++;
+				firstcall = true;
+			}
+//209715200
 			break;
 		}
 	default:
@@ -929,10 +939,6 @@ void BinaryFileAdapter::SaveCollisionProperty(BodyData* bodyData, output_type_t 
 
 		case OUTPUT_TYPE_TEXT:
 		{
-
-			//std::stringstream filename;
-			//filename << "CollisionProperties" << i << '_' << j << ".txt";
-			//string path = output->GetPath(filename.str());
 			Phase phase1, phase2, phase12;
 			OrbitalElement oe1, oe2, oe12;
 
@@ -956,10 +962,29 @@ void BinaryFileAdapter::SaveCollisionProperty(BodyData* bodyData, output_type_t 
 			Tools::ToPhase(y12AC, &phase12);
 			double mu12 = Constants::Gauss2*(bodyData->mass[j] + bodyData->mass[i]);
 			if (Ephemeris::CalculateOrbitalElement(mu12,&phase12,&oe12) == 0) {
-				string pathtemp = output->GetPath("valami.txt");
+				string pathtemp = output->GetPath("OrbitalElements.txt");
 				ofstream writertemp;
 				writertemp.open(pathtemp.c_str(), ios::out | ios::app);
-				writertemp << "valami" << endl;
+				writertemp << setw(20) << setprecision(10) << bodyData->time;
+				writertemp << setw(20) << bodyData->id[i];
+				writertemp << setw(20) << bodyData->id[j];
+				writertemp << setw(20) << setprecision(10) << oe12.semiMajorAxis;
+				writertemp << setw(20) << setprecision(10) << oe12.eccentricity;
+				writertemp << setw(20) << setprecision(10) << oe12.inclination;
+				writertemp << setw(20) << setprecision(10) << oe12.argumentOfPericenter;
+				writertemp << setw(20) << setprecision(10) << oe12.longitudeOfNode;
+				writertemp << setw(20) << setprecision(10) << oe12.meanAnomaly;
+
+				writertemp << endl;
+
+				if (writertemp.bad()) {
+					_errMsg = "An error occurred during writing the collision properties!";
+					Log(_errMsg, true);
+					perror(_errMsg.c_str());
+					exit(1);
+				}
+
+				writertemp.close();
 			}
 
 			delete[] y1AC;

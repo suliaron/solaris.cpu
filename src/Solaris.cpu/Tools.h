@@ -27,6 +27,7 @@ public:
 	
 	static std::string GetDirectory(const std::string path, const char directorySeparator);
 	static std::string GetFileName(const std::string path, const char directorySeparator);
+	static int GetFileSize(const std::string path);
 	static int	GetDirectorySeparator(char *c);
 	static int	GetWorkingDirectory(std::string &wd);
 	static enum OS GetOs();

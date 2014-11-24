@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <list>
 #include <string>
@@ -135,6 +136,23 @@ std::string Tools::GetFileName(const std::string path, const char directorySepar
 	}
 	found = path.find_last_of(directorySeparator);
 	return path.substr(found+1);
+}
+
+int Tools::GetFileSize(const std::string path) {
+	std::fstream fs;
+	int size;
+	fs.open(path.c_str(), std::ios::in);
+	if (fs.is_open()) {
+		fs.seekg(0, std::ios::end);
+		size = fs.tellg();
+		fs.close();
+    }
+	else {
+		Error::_errMsg = "Could not open file\n";
+		Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		return 1;
+    }
+	return size;
 }
 
 /// Determines the directory separator character and stores it in the c parameter.

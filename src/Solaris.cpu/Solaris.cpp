@@ -208,13 +208,13 @@ int main(int argc, char* argv[])
 		Tools::CreatePath(Output::directory, fileNameNebula, Output::directorySeparator, &inputPathNebula);
 	}
 
-    Simulation  simulation(runType);
+	Simulation  simulation(runType);
 	if (LoadInput(inputPathSettings, inputPathBodyGroupList, inputPathNebula, simulation) == 1) {
 		Error::PrintStackTrace();
 		exit(1);
 	}
 
-	simulation.settings.output.directory = Output::directory + Output::directorySeparator + "Output_3";
+	simulation.settings.output.directory = Output::directory + Output::directorySeparator + "Output_e10";
 
     simulation.binary = new BinaryFileAdapter(&simulation.settings.output);
 	simulation.binary->LogStartParameters(argc, argv);

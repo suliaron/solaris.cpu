@@ -179,8 +179,8 @@ int	Simulator::DecisionMaking(TimeLine* timeLine, bool& stop)
 	}
 
 	if (detectcollision) {
-		_simulation->settings.integrator->epsilon = pow(10.0, -12.0);
-		_simulation->settings.integrator->epsilon = pow(10.0, -14.0);
+	//	_simulation->settings.integrator->epsilon = pow(10.0, -12.0);
+	//	_simulation->settings.integrator->epsilon = pow(10.0, -14.0);
 		detectcollision = false;
 	}
 	else {

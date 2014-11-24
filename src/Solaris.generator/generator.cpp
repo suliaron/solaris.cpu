@@ -510,7 +510,7 @@ int main(int argc, const char **argv)
 		set(test_disk.oe_d[type].item[ORBELEM_NAME_NODE], 0.0, pdf_const);
 		set(test_disk.oe_d[type].item[ORBELEM_NAME_MEAN], 0.0, 360.0 * Constants::DegreeToRadian, pdf_const);
 
-		set(test_disk.pp_d[type].item[PHYS_PROP_NAME_RADIUS], 100 * Constants::KilometerToAu, 1000 * Constants::KilometerToAu, pdf_const);
+		set(test_disk.pp_d[type].item[PHYS_PROP_NAME_MASS], 1e-9, pdf_const);
 		set(test_disk.pp_d[type].item[PHYS_PROP_NAME_DENSITY], 2.0 * Constants::GramPerCm3ToSolarPerAu3, pdf_const);
 		set(test_disk.pp_d[type].item[PHYS_PROP_NAME_DRAG_COEFF], 0.0, pdf_const);
 		test_disk.mig_type[index_of_body] = MIGRATION_TYPE_NO;
@@ -518,8 +518,8 @@ int main(int argc, const char **argv)
 
 	}
 
-	outDir = "E:\\Work\\ELTE\\TestInput\\Test2"; //"C:\\Work\\Projects\\solaris.cpu\\TestInput\\TwoBody";
-	generate_pp_disk(combine_path(outDir, "test2_2.txt"), test_disk);
+	outDir = "E:\\Work\\ELTE\\TestInput\\TestVegleges"; //"C:\\Work\\Projects\\solaris.cpu\\TestInput\\TwoBody";
+	generate_pp_disk(combine_path(outDir, "body.txt"), test_disk);
 
 	delete[] test_disk.mig_type;
 	delete[] test_disk.stop_at;
