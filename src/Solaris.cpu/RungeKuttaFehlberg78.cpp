@@ -103,8 +103,6 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 	//	binary.SaveElapsedTimes(timeLine->time, timer, output.outputType);
 	//	binary.SaveElapsedTimes(timeLine->time, stimer, output.outputType);
 
-
-
 		errorMax = GetErrorMax(nVar, bodyData->error, bodyData->yscale);
 		if (errorMax < 1.0) {
 			timeLine->hDid = bodyData->h;
@@ -115,13 +113,17 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 		bodyData->h = fabs(hTemp) > fabs(0.1*bodyData->h) ? hTemp : 0.1*bodyData->h;
 
 		double tNew = timeLine->time + bodyData->h;
-		if (tNew == timeLine->time) {
-			Error::_errMsg = "Stepsize-underflow occurred during Runge-Kutta-Fehlberg7(8) step!";
-			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-			result = 1;
+		//if (tNew == timeLine->time)
+		if (fabs(tNew - timeLine->time) < 1.0 / 86400.0 ) /* = 1 sec */
+		{
+			errorMax = 0.99;
+			fprintf(stderr, "Warning: Stepsize-underflow occurred during Runge-Kutta-Fehlberg7(8) step!\n");
+			//Error::_errMsg = "Stepsize-underflow occurred during Runge-Kutta-Fehlberg7(8) step!";
+			//Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+			result = 0;
 			break;
 		}
-	}
+	} /*  while( 1 ) */
 	if (result == 0) {
 		// Update time
 		timeLine->time += timeLine->hDid;
