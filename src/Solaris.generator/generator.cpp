@@ -169,7 +169,7 @@ void print_body_record(ofstream &output, string name, param_t *param, vec_t *r, 
 void print_body_record(ofstream &output, string name, orbelem_t *oe, int precision)
 {
 	output << endl;
-	output << setw(15) << setprecision(precision) << oe->ecc << setw(15) << oe->inc << setw(15) << oe->mean << setw(15) << oe->node << setw(15) << oe->peri << setw(15) << oe->sma;
+	output << setw(15) << setprecision(precision) << oe->sma << setw(15) << oe->ecc << setw(15) << oe->inc << setw(15) << oe->peri << setw(15) << oe->node << setw(15) << oe->mean;
 
 }
 
@@ -306,7 +306,8 @@ int generate_pp_disk(string &path, body_disk_t& body_disk)
 					generate_pp(body_disk.pp_d[body_type], param0);
 					param0.mig_type = body_disk.mig_type[bodyId];
 					param0.mig_stop_at = body_disk.stop_at[bodyId];
-					print_body_record(output, body_disk.names[bodyId], &param0, &rVec, &vVec, precision);
+					//print_body_record(output, body_disk.names[bodyId], &param0, &rVec, &vVec, precision);
+					print_body_record(output,body_disk.names[bodyId],&oe,precision);
 				}
 				else 
 				{
@@ -326,8 +327,8 @@ int generate_pp_disk(string &path, body_disk_t& body_disk)
 						return ret_code;
 					}
 
-					print_body_record(output, body_disk.names[bodyId], &param, &rVec, &vVec, precision);
-
+					//print_body_record(output, body_disk.names[bodyId], &param, &rVec, &vVec, precision);
+					print_body_record(output,body_disk.names[bodyId],&oe,precision);
 				}
 			}
 		}
@@ -519,7 +520,7 @@ int main(int argc, const char **argv)
 	}
 
 	outDir = "E:\\Work\\ELTE\\TestInput\\TestVegleges"; //"C:\\Work\\Projects\\solaris.cpu\\TestInput\\TwoBody";
-	generate_pp_disk(combine_path(outDir, "body.txt"), test_disk);
+	generate_pp_disk(combine_path(outDir, "body2.txt"), test_disk);
 
 	delete[] test_disk.mig_type;
 	delete[] test_disk.stop_at;

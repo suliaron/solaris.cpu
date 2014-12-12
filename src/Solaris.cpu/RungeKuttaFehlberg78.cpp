@@ -64,12 +64,12 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 	acceleration->evaluateTypeIMigration	= true;
 	acceleration->evaluateTypeIIMigration	= true;
 
-	StopWatch *stimer = new StopWatch[13];
+	//StopWatch *stimer = new StopWatch[13];
 
 	// Calculate the acceleration in the initial point
-	stimer[0].start();
+	//stimer[0].start();
 	acceleration->Compute(timeLine->time, bodyData->y0, bodyData->accel);
-	stimer[0].stop();
+	//stimer[0].stop();
 
 	// NOTE: Kikapcsolom a GasDrag erők kiszámítását, gyorsítva ezzel az integrálást.
 	// Készíteni összehasonlításokat, és értékelni az eredményeket, abbol a szempontbol, hogy így mennyire pontos az integralas.
@@ -83,25 +83,25 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 			bodyData->yscale[i] = fabs(bodyData->y0[i]) + fabs(bodyData->h * bodyData->accel[i]) + TINY;
 		}
 
-		StopWatch timer;
-		timer.start();
-		//if (Step(bodyData, acceleration) == 1) {
-		//	Error::_errMsg = "An error occurred during Runge-Kutta-Fehlberg7(8) step!";
-		//	Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
-		//	result = 1;
-		//	break;
-		//}
-		if (Step(bodyData, acceleration, stimer) == 1) {
+	//	StopWatch timer;
+	//	timer.start();
+		if (Step(bodyData, acceleration) == 1) {
 			Error::_errMsg = "An error occurred during Runge-Kutta-Fehlberg7(8) step!";
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			result = 1;
 			break;
 		}
-		timer.stop();
-		Output output;
-		BinaryFileAdapter binary(&output);
-		binary.SaveElapsedTimes(timeLine->time, timer, output.outputType);
-		binary.SaveElapsedTimes(timeLine->time, stimer, output.outputType);
+		//if (Step(bodyData, acceleration, stimer) == 1) {
+		//	Error::_errMsg = "An error occurred during Runge-Kutta-Fehlberg7(8) step!";
+		//	Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
+		//	result = 1;
+		//	break;
+		//}
+	//	timer.stop();
+	//	Output output;
+	//	BinaryFileAdapter binary(&output);
+	//	binary.SaveElapsedTimes(timeLine->time, timer, output.outputType);
+	//	binary.SaveElapsedTimes(timeLine->time, stimer, output.outputType);
 
 
 
@@ -133,7 +133,7 @@ int RungeKuttaFehlberg78::Driver(BodyData *bodyData, Acceleration *acceleration,
 		std::swap(bodyData->y0, bodyData->y);
 	}
 	
-	delete[] stimer;
+	//delete[] stimer;
 	//delete[] accel;
 	//delete[] yscale;
 	//delete[] yerr;
@@ -267,6 +267,7 @@ int RungeKuttaFehlberg78::Step(BodyData *bodyData, Acceleration *acceleration)
 	return 0;
 }
 
+/*
 int RungeKuttaFehlberg78::Step(BodyData *bodyData, Acceleration *acceleration, StopWatch *stimer)
 {
 	// These arrays will contain the accelerations computed along the trajectory of the current step
@@ -411,6 +412,8 @@ int RungeKuttaFehlberg78::Step(BodyData *bodyData, Acceleration *acceleration, S
 
 	return 0;
 }
+*/
+
 
 double RungeKuttaFehlberg78::GetErrorMax(const int n, const double *yerr, const double *yscale)
 {

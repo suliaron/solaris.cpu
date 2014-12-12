@@ -112,17 +112,17 @@ int Simulator::Integrate(TimeLine* timeLine)
 	_simulation->binary->SaveIntegrals(timeLine->time, 16, bodyData.integrals, _simulation->settings.output.outputType);
 
 	bool stop = false;
-	StopWatch timer1, timer2;
+//	StopWatch timer1, timer2;
 
 	while ( 1 ) {
 		
-		timer1.start();
-		timer2.start();
+//		timer1.start();
+//		timer2.start();
 		if (_simulation->settings.integrator->Driver(&bodyData, _acceleration, timeLine) == 1) {
 			Error::PushLocation(__FILE__, __FUNCTION__, __LINE__);
 			return 1;
 		}
-		timer1.stop();
+//		timer1.stop();
 		counter.succededStep++;
 
 		if (DecisionMaking(timeLine, stop) == 1) {
@@ -142,8 +142,8 @@ int Simulator::Integrate(TimeLine* timeLine)
 		if (stop)
 			break;
 
-		timer2.stop();
-		_simulation->binary->SaveElapsedTimes(timeLine->time, counter, timer1, timer2, _simulation->settings.output.outputType);
+		//timer2.stop();
+		//_simulation->binary->SaveElapsedTimes(timeLine->time, counter, timer1, timer2, _simulation->settings.output.outputType);
 	}
 
 	_simulation->binary->SavePhases(timeLine->time, bodyData.nBodies.total, bodyData.y0, bodyData.id, _simulation->settings.output.outputType, bodyData.nBodies.removed);

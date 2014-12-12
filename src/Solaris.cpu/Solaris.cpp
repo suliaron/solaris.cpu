@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-	simulation.settings.output.directory = Output::directory + Output::directorySeparator + "Output_e10";
+	simulation.settings.output.directory = Output::directory + Output::directorySeparator + "Output_long_e10";
 
     simulation.binary = new BinaryFileAdapter(&simulation.settings.output);
 	simulation.binary->LogStartParameters(argc, argv);
